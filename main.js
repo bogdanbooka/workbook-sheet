@@ -1,4 +1,6 @@
-//<!-- created by Melnikov Bogdan -->
+//Melnikov Bogdan, December 2014
+//booka.friend.of.sun@gmail.com
+
 $(document).ready(function(){
 	
 	var c_newCreatedShapesCount = 0;
