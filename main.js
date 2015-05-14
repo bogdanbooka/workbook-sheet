@@ -266,6 +266,9 @@ $(document).ready(function(){
 						canvas.clearShape.append(canvas.clearShape.image);
 
 						var oCanvas = document.createElement("canvas");
+						oCanvas.width = imgData.width;
+						oCanvas.height = imgData.height;
+						
 						var oCtx = oCanvas.getContext("2d");
 						oCtx.putImageData(imgData, 0, 0);
 
