@@ -1,10 +1,12 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
+function log(obj){
+  /*console.log(obj);//*/
+}
 
 $(document).ready(function(){
-	function log(obj){
-	  console.log(obj);//*/
-	}
+	document.oncontextmenu = function() {return false;};
+
 	var c_newCreatedShapesCount = 0;
 	var c_movingLimit = 5;
 	var c_cornerShapeHalfSize = 8;
@@ -23,13 +25,14 @@ $(document).ready(function(){
 	var c_shapeColor_Green = "green";
 	var c_shapeColor_Blue = "blue";
 	var c_shapeColor_Default = "default";
+	var c_imageEditorRelativeSize = 0.95;
 	var c_colorsByCorners = {
 	  left_top: c_shapeColor_Red,
 	  left_bottom: c_shapeColor_Green,
 	  right_top: c_shapeColor_Blue,
 	  right_bottom: c_shapeColor_Yellow
 	};
-	var c_imageEditorRelativeSize = 0.95;
+
 	var zShapes = [];
 	function topZOrder(){return zShapes.length;}
 	function addToZOrderedShapes(newZShape){
@@ -57,7 +60,7 @@ $(document).ready(function(){
 		}
 		addToZOrderedShapes(topZShape);
 	}
-	document.oncontextmenu = function() {return false;};
+
 	var clickedObject = 0;
 	function setClickedObject(obj){
 		clickedObject = obj;
@@ -70,15 +73,15 @@ $(document).ready(function(){
 		clickedObject = 0;
 	}
 	function isClickedObject(obj){return clickedObject === obj;}
+	
+	var body = $(document.body);
+	var docWindow = $(window); 
+
 	function showPicEditorForObject(obj){
-		var alreadyHasImage = false;
-		if (obj.imgObj) 
-		  if (obj.imgObj.attr("src").length > 0) 
-		    alreadyHasImage = true;
-		else addImgObjToShape(obj);
-		var body = $(document.body);
-		var docWindow = $(window); 
+		var alreadyHasImage = ((obj.imgObj) && (obj.imgObj.attr("src").length > 0));
+		if (!alreadyHasImage) addImgObjToShape(obj);
 		var windowSize = {w: docWindow.width() , h: docWindow.height()};
+
 		var objSize = {w: obj.width(), h: obj.height()};
 		if (alreadyHasImage){
 		  var img_element = obj.imgObj;
@@ -86,6 +89,7 @@ $(document).ready(function(){
 			t.src = (img_element.attr ? img_element.attr("src") : false) || img_element.src;
 			objSize = {w: t.width, h: t.height};
 		}
+		
 		var heightMore = (objSize.w / windowSize.w) < (objSize.h / windowSize.h);
 		var editorSize = {w: 0, h: 0};
 		if (heightMore){
@@ -98,7 +102,7 @@ $(document).ready(function(){
 		var editorPos = {x: (windowSize.w - editorSize.w) / 2, y: (windowSize.h - editorSize.h) / 2};
 		var imageEditor = $('<div id="canvasHolder" style="position:absolute; z-index:'+topZOrder()
 		  +';"><canvas id="imageEditor" width="'+editorSize.w
-		    +'" height="'+editorSize.h+'" style="cursor: crosshair; max-width: 100%; max-height: 100%;"></canvas></div>');
+		  +'" height="'+editorSize.h+'" style="cursor: crosshair; max-width: 100%; max-height: 100%;"></canvas></div>');
 		body.append(imageEditor);
 		var canvas = document.getElementById('imageEditor');
 		var canvasObj = $(canvas);
