@@ -150,17 +150,11 @@ $(document).ready(function(){
 					//create clear rect
 					canvas.clearShape = $('<div id="clearShape" style="cursor: crosshair; position: absolute; z-index: '+(topZOrder()+1)+';"></div>');
 					imageEditor.append(canvas.clearShape);
-
-  				var shapePos = {
-  					top: Math.round(Math.min(canvas.endPos.y, canvas.startPos.y)), 
-  					left: Math.round(Math.min(canvas.endPos.x, canvas.startPos.x))};
-
-  				canvas.clearShape.css({
-  					'top': shapePos.top+'px', 
-  					'left': shapePos.left+'px'});
 				}
 
 				canvas.clearShape.css({
+          'top': Math.round(Math.min(canvas.endPos.y, canvas.startPos.y))+'px', 
+          'left': Math.round(Math.min(canvas.endPos.x, canvas.startPos.x))+'px',
 					'width': Math.abs(canvas.endPos.x - canvas.startPos.x)+'px', 
 					'height':Math.abs(canvas.endPos.y - canvas.startPos.y)+'px'});
 			}
@@ -426,6 +420,9 @@ $(document).ready(function(){
 	}
 
 	function addImgObjToShape(newShape){
+	  if (newShape.imgObj){
+	    return;
+	  }
 		var imageHolder = $('<div id="imageHolder"></div>');
 		var imgObj = $('<img id="image" src=""/>');
 		
@@ -437,7 +434,6 @@ $(document).ready(function(){
 	}
 
 	area.setBehaviourToShape = function(newShape){
-
 		addToZOrderedShapes(newShape);
 		
 		setClickedFunctionsToObject(newShape);
