@@ -75,6 +75,9 @@ $(document).ready(function(){
 	function isClickedObject(obj){return clickedObject === obj;}
 	
 	var body = $(document.body);
+	body.scrollLeft(3500);
+	body.scrollTop(2500);
+
 	var docWindow = $(window); 
 
 	function showPicEditorForObject(obj){
@@ -750,7 +753,6 @@ $(document).ready(function(){
 						isTop = false;
 					}else if (newH <= 0){
 						newY = currCornerShape.ownerStartRect.y + newH;
-						newH = Math.abs(newH);
 					}
 					obj.setMustBeShowedByCorner(isLeft, isTop);
 					
