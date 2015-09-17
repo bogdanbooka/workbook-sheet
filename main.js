@@ -102,7 +102,7 @@ $(document).ready(function(){
 			editorSize.w = windowSize.w*c_imageEditorRelativeSize;
 			editorSize.h = editorSize.w/(objSize.w/objSize.h);
 		}
-		var editorPos = {x: (windowSize.w - editorSize.w) / 2, y: (windowSize.h - editorSize.h) / 2};
+		var editorPos = {x: (windowSize.w - editorSize.w) / 2 + body.scrollLeft(), y: (windowSize.h - editorSize.h) / 2 + body.scrollTop()};
 		var imageEditor = $('<div id="canvasHolder" style="position:absolute; z-index:'+topZOrder()
 		  +';"><canvas id="imageEditor" width="'+editorSize.w
 		  +'" height="'+editorSize.h+'" style="cursor: crosshair; max-width: 100%; max-height: 100%;"></canvas></div>');
@@ -303,8 +303,14 @@ $(document).ready(function(){
 			mouseup: imageEditor.mouseUpHandler
 		});
 		if (obj.imgObj.hasPicture()){
-			imageEditor.css({'top': obj.imgObj.offset().top+'px', 'left': obj.imgObj.offset().left+'px', 'width': obj.imgObj.width()+'px', 'height': obj.imgObj.height()+'px'});
-			obj.imgObj.drawToCanvas(ctx);
+		  var imgObjOfset = obj.imgObj.offset();
+		  var imgObjSize = {w:obj.imgObj.width(),h:obj.imgObj.height()};
+			imageEditor.css({'top': imgObjOfset.top+'px', 'left': imgObjOfset.left+'px', 'width': imgObjSize.w+'px', 'height': imgObjSize.h+'px'});
+			if (objSize.w > editorSize.w || objSize.h > editorSize.h){
+  			obj.imgObj.drawToCanvasScaled(ctx, editorSize);
+			}else{
+  			obj.imgObj.drawToCanvas(ctx);
+			}
 		}else{
 			imageEditor.css({'top': obj.offset().top+'px', 'left': obj.offset().left+'px', 'width': obj.width()+'px', 'height': obj.height()+'px'});
 		}
@@ -416,6 +422,10 @@ $(document).ready(function(){
 	function setSelfDrawingToImageObj(imgObj){
 		imgObj.drawToCanvas = function(canvasContext){
 			canvasContext.drawImage(this[0],0,0);
+		}
+		imgObj.drawToCanvasScaled = function(canvasContext, size)
+		{
+		  canvasContext.drawImage(this[0],0,0,this[0].naturalWidth,this[0].naturalHeight,0,0,size.w,size.h);
 		}
 		imgObj.hasPicture = function(){
 			return imgObj.attr('src').length > 0;
