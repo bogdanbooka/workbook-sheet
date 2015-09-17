@@ -694,8 +694,9 @@ $(document).ready(function(){
 							log(cornerShape.attr('id') + ' only click');
 							if (cornerShape.onOnlyClick)
 								cornerShape.onOnlyClick();
-						}else
-						obj.showCornerShapes();
+						}else{
+							obj.showCornerShapes();
+						}
 						cornerShape.resetState();
 						log(cornerShape.attr('id') +' mouseUp OK');
 						obj.animationIsBlocked = false;
@@ -731,9 +732,7 @@ $(document).ready(function(){
 						cornerShape.clickTrace += vectorLengthPoints(currentPos, cornerShape.lastPos);
 						e.preventDefault();
 						log(cornerShape.attr('id') +" mouseMove OK");
-						if (cornerShape.hasInternalMoveHandler == true){
-							cornerShape.internalMoveHandler(currentPos);
-						}
+						if (cornerShape.hasInternalMoveHandler == true) cornerShape.internalMoveHandler(currentPos);
 						cornerShape.lastPos = currentPos;
 					}
 				};
@@ -755,46 +754,29 @@ $(document).ready(function(){
 
 		function setDraggedPropertiesToShape(draggedShape){
 			setClickedFunctionsToObject(draggedShape);
-			
-			if (draggedShape.hasDraggedProperties){
-				return;
-			}
-			
+			if (draggedShape.hasDraggedProperties) return;
 			draggedShape.hasDraggedProperties = true;
-			
 			draggedShape.isPressed = false;
 			draggedShape.startPos = 0;
 			draggedShape.lastPos = 0;
 			draggedShape.clickTrace = 0;
-			
 			draggedShape.resetState = function(){
-				if (isClickedObject(draggedShape)){
-					resetClickedObject();
-				}
 				resetClickedObject();
 				draggedShape.isPressed = false;
 				draggedShape.startPos = 0;
 				draggedShape.lastPos = 0;
 				draggedShape.clickTrace = 0;
 				log(draggedShape.attr('id') +" reset state");
-			}
-		}
-		
+			};
+		};
 		newShape.type = c_shapeType;
 		setDraggedPropertiesToShape(newShape);
-		
 		newShape.mouseUpHandler = function(e){
 			newShape.copyMode = false;
-			if (e.button != newShape.pendingButton){
-				return;
-			}
-			if (!newShape.isClickedState()){
-				return;
-			}
+			if (e.button != newShape.pendingButton) return;
+			if (!newShape.isClickedState()) return;
 			if (e.button == 0 || e.button == 2){
-				if (newShape.isHover()){
-					newShape.showCornerShapes();
-				}
+				if (newShape.isHover()) newShape.showCornerShapes();
 				e.preventDefault();
 				if (newShape.startPos == newShape.lastPos){
 					log(newShape.attr('id') + ' only click');
@@ -810,13 +792,8 @@ $(document).ready(function(){
 				newShape.animationIsBlocked = false;
 				return;
 			}
-			
 			newShape.animationIsBlocked = false;
-			
-			if (newShape.clickTrace > c_movingLimit){
-				return;
-			}
-			
+			if (newShape.clickTrace > c_movingLimit) return;
 			if (e.button == 1){
 				e.preventDefault();
 				newShape.resetState();
@@ -828,11 +805,10 @@ $(document).ready(function(){
 				newShape.resetState();
 				log(newShape.attr('id') +' right click OK');
 			}
-		}
+		};
 
 		newShape.mouseDownHandler = function(e){
 			checkEditorIsOpened();
-
 			if (isClickedObject(0)){
 				e.preventDefault();
 				setClickedObject(newShape);
@@ -844,135 +820,126 @@ $(document).ready(function(){
 				log(newShape.attr('id') +" mouseDown OK button = " + newShape.pendingButton);
 				newShape.animationIsBlocked = true;
 			}
-		}
-		
+		};
 		newShape.mouseMoveHandler = function(e){
-			if (newShape.isClickedState()){//do create something
+			if (newShape.isClickedState()){
 				if (e.which != newShape.pendingButton + 1){
 					newShape.resetState();
 					return;
 				}
 				var currentPos = {x: e.pageX, y: e.pageY};
-				
 				if (vectorLengthPoints(currentPos, newShape.startPos) < c_movingLimit 
-					&& newShape.clickTrace < c_movingLimit){
-					return;
+					&& newShape.clickTrace < c_movingLimit) return;
+					newShape.clickTrace += vectorLengthPoints(currentPos, newShape.lastPos);
+				if (e.which != 1) return;
+				if (newShape.copyMode && e.ctrlKey == true){
+					newShape.copyMode = false;
+					var clonedShape = newShape.clone(false);
+					area.append(clonedShape);
+					area.setBehaviourToShape(clonedShape);
+					setLastZOrderToShape(newShape);
+				}
+				e.preventDefault();
+				log(newShape.attr('index') +" mouseMove OK");
+				var shapePos = newShape.offset();
+				var x = currentPos.x - newShape.lastPos.x + shapePos.left;
+				var y = currentPos.y - newShape.lastPos.y + shapePos.top;
+				newShape.css({'top': y+'px', 'left': x+'px'}); 
+				newShape.lastPos = currentPos;
+				newShape.hideCornerShapes();
 			}
-			
-			newShape.clickTrace += vectorLengthPoints(currentPos, newShape.lastPos);
-
-			if (e.which != 1){
-				return;
-			}
-			
-			if (newShape.copyMode && e.ctrlKey == true){
-				newShape.copyMode = false;
-				var clonedShape = newShape.clone(false);
-				area.append(clonedShape);
-				area.setBehaviourToShape(clonedShape);
-				setLastZOrderToShape(newShape);
-			}
-			
-			e.preventDefault();
-			log(newShape.attr('index') +" mouseMove OK");
-			
-			var shapePos = newShape.offset();
-			
-			var x = currentPos.x - newShape.lastPos.x + shapePos.left;
-			var y = currentPos.y - newShape.lastPos.y + shapePos.top;
-			
-			newShape.css({'top': y+'px', 'left': x+'px'}); 
-			
-			newShape.lastPos = currentPos;
-			
-			newShape.hideCornerShapes();
-		}
+		};
+		log(newShape);
+		newShape.bind({
+			mouseenter: function(e){
+				if (isClickedObject(0)){
+					newShape.showCornerShapes();
+				}
+			},
+			mouseleave: function(e){
+				newShape.hideCornerShapes();
+			},
+			mousemove: function(e){},
+			mousedown: newShape.mouseDownHandler,
+			mouseup: newShape.mouseUpHandler
+		});
 	}
 
-	log(newShape);
-	newShape.bind({
-		mouseenter: function(e){
-			if (isClickedObject(0)){
-				newShape.showCornerShapes();
-			}
-		},
-		mouseleave: function(e){
-			newShape.hideCornerShapes();
-		},
-		mousemove: function(e){},
-		mousedown: newShape.mouseDownHandler,
-		mouseup: newShape.mouseUpHandler
-	});
-}
+	function setClickedFunctionsToObject(obj){
+		if (obj.hasClickedFunctions == true) return;
+		obj.hasClickedFunctions = true;
 
-function setClickedFunctionsToObject(obj){
-	if (obj.hasClickedFunctions == true){
-		return;
-	}
-	obj.hasClickedFunctions = true;
-	
-	obj.isClickedState = function(){
-		return isClickedObject(obj) && obj.isPressed;
-	}
-}
-
-setClickedFunctionsToObject(area)
-
-function findAndSetBehaviourToShapes(){
-	var shapes = $("div#drag_area>div#draggable.moveAble");
-	shapes.each( function(i) { 
-		area.setBehaviourToShape($(shapes[i])); 
-	});
-}
-
-findAndSetBehaviourToShapes();
-
-function vectorLength(ax, ay, bx, by){
-	return Math.pow((ax-bx)*(ax-bx)+(ay-by)*(ay-by), 0.5);
-}
-
-function vectorLengthPoints(p1, p2){
-	return vectorLength(p1.x, p1.y, p2.x, p2.y);
-}
-
-area.clickTrace = function (){
-	var trace = {
-		'top':(area.startPos.top - area.lastPos.top), 
-		'left':(area.startPos.left - area.lastPos.left)
+		obj.isClickedState = function(){
+			return isClickedObject(obj) && obj.isPressed;
+		};
 	};
-	
-	return trace;
-}
 
-area.traceValue = function (){
-	var clickTr = area.clickTrace();
-	var trace = Math.pow((clickTr.top*clickTr.top) + (clickTr.left*clickTr.left), 0.5);
-	return trace;
-}
+	setClickedFunctionsToObject(area);
 
-area.startPos = {top:0, left:0};
-area.lastPos = {top:0, left:0};
+	function findAndSetBehaviourToShapes(){
+		var shapes = $("div#drag_area>div#draggable.moveAble");
+		shapes.each( function(i) { 
+			area.setBehaviourToShape($(shapes[i])); 
+		});
+	};
 
-area.bind({
-	mouseenter: function(e){},
-	mouseleave: function(e){},
-	mousemove: function(e){
-			//log(e.button +" " +e.which);
+	findAndSetBehaviourToShapes();
+
+	function vectorLength(ax, ay, bx, by){
+		return Math.pow((ax-bx)*(ax-bx)+(ay-by)*(ay-by), 0.5);
+	};
+
+	function vectorLengthPoints(p1, p2){
+		return vectorLength(p1.x, p1.y, p2.x, p2.y);
+	};
+
+	area.clickTrace = function (){
+		var trace = {
+			'top':(area.startPos.top - area.lastPos.top), 
+			'left':(area.startPos.left - area.lastPos.left)
+		};
+		return trace;
+	};
+
+	area.traceValue = function (){
+		var clickTr = area.clickTrace();
+		var trace = Math.pow((clickTr.top*clickTr.top) + (clickTr.left*clickTr.left), 0.5);
+		return trace;
+	};
+
+	area.startPos = {top:0, left:0};
+	area.lastPos = {top:0, left:0};
+
+	area.bind({
+		mouseenter: function(e){},
+		mouseleave: function(e){},
+		mousemove: function(e){
 			if (area.isClickedState()){//do create new shape
-				if (e.which != 1 && e.which != 3){
+				if (e.which != 1 && e.which != 2 && e.which != 3){
 					area.resetState();
 					return;
 				}
 
-//				var lastTrace = {y:e.pageY-area.lastPos.top, x:e.pageX-area.lastPos.left};
-area.lastPos = {top:e.pageY, left:e.pageX};
+				e.preventDefault();
 
-if (area.traceValue() < 10){
-	return;
-}
+				if (e.which == 2){
+  				var currentPos = {top:e.pageY, left:e.pageX};
 
-if (!area.processedShape){
-					//create shape
+				  var dx = currentPos.left - area.lastPos.left;
+				  var dy = currentPos.top - area.lastPos.top;
+				  
+  				area.lastPos = {top:e.pageY - dy, left:e.pageX - dx};
+
+				  body.scrollLeft(body.scrollLeft() - dx);
+				  body.scrollTop(body.scrollTop() - dy);
+					return;
+				}
+
+				area.lastPos = {top:e.pageY, left:e.pageX};
+
+				if (area.traceValue() < 10) return;
+
+				if (!area.processedShape){
 					log("create shape");
 					area.processedShape = $('<div id="draggable" class="moveAble" style="z-index: '+topZOrder()+';"></div>');
 					area.processedShape.state = c_shapeCreateState;
@@ -983,44 +950,35 @@ if (!area.processedShape){
 				
 				var shapeSize = {
 					h: Math.abs(area.lastPos.top - area.startPos.top), 
-					w: Math.abs(area.lastPos.left - area.startPos.left)};
-					
-					if(e.shiftKey && area.processedShape.state != c_shapeSelectingState){
-						area.processedShape.state = c_shapeSelectingState;
-						area.processedShape.attr('id','selecting_draggable');
-					}else if(!e.shiftKey){
-						if(area.processedShape.state != c_shapeWrongState 
-							&& (shapeSize.h < c_minShapeSize.h || shapeSize.w < c_minShapeSize.w)){
-							log('change id to wrong');
+					w: Math.abs(area.lastPos.left - area.startPos.left)
+				};
+
+				if(e.shiftKey && area.processedShape.state != c_shapeSelectingState){
+					area.processedShape.state = c_shapeSelectingState;
+					area.processedShape.attr('id','selecting_draggable');
+				}else if(!e.shiftKey){
+					if(area.processedShape.state != c_shapeWrongState && (shapeSize.h < c_minShapeSize.h || shapeSize.w < c_minShapeSize.w)){
+						log('change id to wrong');
 						area.processedShape.state = c_shapeWrongState;
 						area.processedShape.attr('id','wrong_draggable');
-					}else if (area.processedShape.state != c_shapeCreateState 
-						&& (shapeSize.h >= c_minShapeSize.h 
-							&& shapeSize.w >= c_minShapeSize.w)){
-//						log('change id to ok')
-area.processedShape.state = c_shapeCreateState;
-area.processedShape.attr('id','draggable');
-}
-}
+					}else if (area.processedShape.state != c_shapeCreateState && (shapeSize.h >= c_minShapeSize.h && shapeSize.w >= c_minShapeSize.w)){
+						area.processedShape.state = c_shapeCreateState;
+						area.processedShape.attr('id','draggable');
+					}
+				}
 
-var shapePos = {
-	top: Math.min(area.lastPos.top, area.startPos.top), 
-	left: Math.min(area.lastPos.left, area.startPos.left)
-};
+				var shapePos = {
+					top: Math.min(area.lastPos.top, area.startPos.top), 
+					left: Math.min(area.lastPos.left, area.startPos.left)
+				};
 
-area.processedShape.css({
-	'top': shapePos.top+'px', 
-	'left': shapePos.left+'px', 
-	'width':shapeSize.w+'px', 
-	'height': shapeSize.h+'px'});
+				area.processedShape.css({
+					'top': shapePos.top+'px', 
+					'left': shapePos.left+'px', 
+					'width':shapeSize.w+'px', 
+					'height': shapeSize.h+'px'}
+					);
 
-e.preventDefault();
-
-//				log(area.selector +" mousemove OK" + e);
-//				log(e);
-
-				//if cursor trace more than min trace value
-				//then calculate new shape rect and draw it (add it to area and edit css property)
 			}else if (clickedObject != 0){
 				switch (clickedObject.type){
 					case c_areaType:{
@@ -1039,7 +997,7 @@ e.preventDefault();
 			}
 		},
 		mouseup: function(e){
-			if (e.button == 0 || e.button == 2){
+			if (e.button == 0 || e.button == 1 || e.button == 2){
 				if (area.isClickedState()){
 					e.preventDefault();
 					if (area.processedShape){
@@ -1048,21 +1006,15 @@ e.preventDefault();
 								area.processedShape.remove();
 								break;
 							}
-							case c_shapeCreateState:{
-								//add handlers for moving edit resize
-								
+							case c_shapeCreateState:{//add handlers for moving edit resize
 								area.setBehaviourToShape(area.processedShape);
-								
-								if (e.button == 0){
+								if (e.button == 0)
 									showTextEditorForObject(area.processedShape);
-								}else if (e.button == 2){
+								else if (e.button == 2)
 									showPicEditorForObject(area.processedShape);
-								}
-
 								break;
 							}
-							case c_shapeSelectingState:{
-								//select all shapes under this shape
+							case c_shapeSelectingState:{//select all shapes under this shape
 								area.processedShape.remove();
 								break;
 							}
@@ -1097,7 +1049,7 @@ e.preventDefault();
 		},
 		mousedown: function(e){
 			checkEditorIsOpened();
-			if ((e.button == 0  || e.button == 2) && isClickedObject(0)){
+			if ((e.button == 0 || e.button == 1 || e.button == 2) && isClickedObject(0)){
 				e.preventDefault();
 				area.setClickedState(e);
 				//log(area.attr('id') +" mousedown OK");
