@@ -307,46 +307,44 @@ $(document).ready(function(){
 			imageEditor.css({'top': obj.offset().top+'px', 'left': obj.offset().left+'px', 'width': obj.width()+'px', 'height': obj.height()+'px'});
 		}
 		imageEditor.animate({top: editorPos.y, left: editorPos.x, width: editorSize.w, height: editorSize.h}, 200);
-//		imageEditor.css({'top':editorPos.y+'px', 'left':editorPos.x+'px', 'width':editorSize.w+'px', 'height': editorSize.h+'px'});
-imageEditor.doNotEdited = true;
-imageEditor.saveToObject = function(){
-	function removeEditor(){
-		if (imageEditor.doNotEdited){
-		}else{
-			var dataURL = canvas.toDataURL('image/png');
-			obj.imgObj.attr('src',dataURL);
+
+		imageEditor.doNotEdited = true;
+		imageEditor.saveToObject = function(){
+			function removeEditor(){
+				if (imageEditor.doNotEdited){
+				}else{
+					var dataURL = canvas.toDataURL('image/png');
+					obj.imgObj.attr('src',dataURL);
+				}
+				imageEditor.remove();
+				area.currentActiveEditor = 0;
+				area.editShapeState = false;
+			}
+			if (obj.imgObj.hasPicture()){
+				imageEditor.animate({top: obj.imgObj.offset().top, left: obj.imgObj.offset().left, width: obj.imgObj.width(), height: obj.imgObj.height()}, 200, removeEditor);
+			}	else {
+				imageEditor.animate({top: obj.offset().top, left: obj.offset().left, width: obj.width(), height: obj.height()}, 200, removeEditor);
+			}
+		};
+		area.currentActiveEditor = imageEditor;
+		area.editShapeState = true;
+	}
+	function showTextEditorForObject(obj){
+		var objText = '';
+		if (obj.textObj && obj.textObj.text().length > 0){
+			objText = obj.textObj.html();
+			objText = objText.replace(/<br>/g,"\n");
 		}
-		imageEditor.remove();
-		area.currentActiveEditor = 0;
-		area.editShapeState = false;
-	}
-	if (obj.imgObj.hasPicture()){
-		imageEditor.animate({top: obj.imgObj.offset().top, left: obj.imgObj.offset().left, width: obj.imgObj.width(), height: obj.imgObj.height()}, 200, removeEditor);
-	}	else {
-		imageEditor.animate({top: obj.offset().top, left: obj.offset().left, width: obj.width(), height: obj.height()}, 200, removeEditor);
-	}
-};
-area.currentActiveEditor = imageEditor;
-area.editShapeState = true;
-}
-function showTextEditorForObject(obj){
-	var objText = '';
-	if (obj.textObj && obj.textObj.text().length > 0){
-		objText = obj.textObj.html();
-		objText = objText.replace(/<br>/g,"\n");
-//			objText = objText.replace(/(<a)(\s)(id)(\=)(\")(link)(\")(\s)(href)(\=)(\")/, "");
-//			objText = objText.replace(/(\")(\s)(target)(\=)(\")(_blank)(\")(>Link<\/a>)/, "");
-}
-obj.hideCornerShapes();
-var textEditor = $('<textarea id="textEditor" value="'+objText+'" style="z-index: '+topZOrder()+';"></textarea>');
-textEditor.type = c_editorType;
-$(document.body).append(textEditor);
-textEditor.css({'top':(obj.offset().top - 3)+'px', 'left':(obj.offset().left - 3)+'px', 'width':obj.width()+'px', 'height': obj.height()+'px'});
-textEditor.saveToObject = function(){
-	var editorStr = textEditor.val();
-	editorStr = editorStr.replace(/\n/g,"<br>");
-	function linkify(inputText) {
-		var replacedText, replacePattern1, replacePattern2, replacePattern3;
+		obj.hideCornerShapes();
+		var textEditor = $('<textarea id="textEditor" value="'+objText+'" style="z-index: '+topZOrder()+';"></textarea>');
+		textEditor.type = c_editorType;
+		$(document.body).append(textEditor);
+		textEditor.css({'top':(obj.offset().top - 3)+'px', 'left':(obj.offset().left - 3)+'px', 'width':obj.width()+'px', 'height': obj.height()+'px'});
+		textEditor.saveToObject = function(){
+			var editorStr = textEditor.val();
+			editorStr = editorStr.replace(/\n/g,"<br>");
+			function linkify(inputText) {
+				var replacedText, replacePattern1, replacePattern2, replacePattern3;
 				//URLs starting with http://, https://, or ftp://
 				replacePattern1 = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
 				replacedText = inputText.replace(replacePattern1, '<a id="link" href="$1" target="_blank">Link</a>');
@@ -355,18 +353,7 @@ textEditor.saveToObject = function(){
 				replacedText = replacedText.replace(replacePattern2, '$1<a id="link" href="http://$2" target="_blank">Link</a>');
 				return replacedText;
 			}
-			//editorStr = linkify(editorStr);
 			obj.textObj.html(editorStr);
-			/*{
-				var linkList = obj.textObj.find("a#link");
-				for (var i = 0, count = linkList.length; i < count; ++i){
-					$(linkList[i]).bind({
-					mousedown: function(e){
-						e.stopPropagation();
-						window.open(this.href); return false;
-					}});
-				}
-			}//*/
 			textEditor.remove();
 			area.currentActiveEditor = 0;
 			area.editShapeState = false;
@@ -375,157 +362,125 @@ textEditor.saveToObject = function(){
 		area.currentActiveEditor = textEditor;
 		textEditor.val(objText);
 		area.editShapeState = true;
-		/*textEditor.bind({
-			mousedown: function (){
-			}
-		});//*/
-}
-function checkEditorIsOpened(){ if(area.editShapeState) area.currentActiveEditor.saveToObject();}
-var area = $('#drag_area');
-area.isPressed = false;
-area.type = c_areaType;
-area.processedShape = 0;
-area.resetState = function(){
-	if (isClickedObject(area)) resetClickedObject(); 
+	}
+	function checkEditorIsOpened(){ if(area.editShapeState) area.currentActiveEditor.saveToObject();}
+	var area = $('#drag_area');
 	area.isPressed = false;
-	area.startPos = {top:0, left:0};
-	area.lastPos = {top:0, left:0};
+	area.type = c_areaType;
 	area.processedShape = 0;
-	log(area.attr('id') +" reset state");
-};
-area.setClickedState = function(e){
-	if (!isClickedObject(0)) return;
-	setClickedObject(area);
-	area.isPressed = true;
-	area.startPos = {top:e.pageY, left:e.pageX};
-	area.lastPos = {top:e.pageY, left:e.pageX};
-};
+	area.resetState = function(){
+		if (isClickedObject(area)) resetClickedObject(); 
+		area.isPressed = false;
+		area.startPos = {top:0, left:0};
+		area.lastPos = {top:0, left:0};
+		area.processedShape = 0;
+		log(area.attr('id') +" reset state");
+	};
+	area.setClickedState = function(e){
+		if (!isClickedObject(0)) return;
+		setClickedObject(area);
+		area.isPressed = true;
+		area.startPos = {top:e.pageY, left:e.pageX};
+		area.lastPos = {top:e.pageY, left:e.pageX};
+	};
+	function addTextObjToShape(newShape){
+		var textHolder = $('<div id="textHolder"></div>');
+		var textObj = $('<p id="text"></p>');
 
-function addTextObjToShape(newShape){
-	var textHolder = $('<div id="textHolder"></div>');
-	var textObj = $('<p id="text"></p>');
-	
-	textHolder.append(textObj);
-	newShape.append(textHolder);
-	
-	newShape.textObj = textObj;
-}
+		textHolder.append(textObj);
+		newShape.append(textHolder);
 
-function setSelfDrawingToImageObj(imgObj){
-	imgObj.drawToCanvas = function(canvasContext){
-		canvasContext.drawImage(this[0],0,0);
+		newShape.textObj = textObj;
 	}
-	imgObj.drawToCanvasScaled = function(canvasContext, size)
-	{
-		canvasContext.drawImage(this[0],0,0,this[0].naturalWidth,this[0].naturalHeight,0,0,size.w,size.h);
-	}
-	imgObj.hasPicture = function(){
-		return imgObj.attr('src').length > 0;
-	}
-}
-
-function addImgObjToShape(newShape){
-	if (newShape.imgObj){
-		return;
-	}
-	var imageHolder = $('<div id="imageHolder"></div>');
-	var imgObj = $('<img id="image" src=""/>');
-	
-	imageHolder.append(imgObj);
-	newShape.append(imageHolder);
-	
-	newShape.imgObj = imgObj;
-	setSelfDrawingToImageObj(newShape.imgObj);
-}
-
-area.setBehaviourToShape = function(newShape){
-	addToZOrderedShapes(newShape);
-	
-	setClickedFunctionsToObject(newShape);
-	if (newShape.attr('index') == undefined){
-			//alert(newShape.attr('index'));
-			newShape.attr('index', c_newCreatedShapesCount++);
+	function setSelfDrawingToImageObj(imgObj){
+		imgObj.drawToCanvas = function(canvasContext){
+			canvasContext.drawImage(this[0],0,0);
 		}
-		
+		imgObj.drawToCanvasScaled = function(canvasContext, size)
+		{
+			canvasContext.drawImage(this[0],0,0,this[0].naturalWidth,this[0].naturalHeight,0,0,size.w,size.h);
+		}
+		imgObj.hasPicture = function(){
+			return imgObj.attr('src').length > 0;
+		}
+	}
+	function addImgObjToShape(newShape){
+		if (newShape.imgObj){
+			return;
+		}
+		var imageHolder = $('<div id="imageHolder"></div>');
+		var imgObj = $('<img id="image" src=""/>');
+
+		imageHolder.append(imgObj);
+		newShape.append(imageHolder);
+
+		newShape.imgObj = imgObj;
+		setSelfDrawingToImageObj(newShape.imgObj);
+	};
+	area.setBehaviourToShape = function(newShape){
+		addToZOrderedShapes(newShape);
+
+		setClickedFunctionsToObject(newShape);
+		if (newShape.attr('index') == undefined)
+			newShape.attr('index', c_newCreatedShapesCount++);
 		var imgs = newShape.find('img#image');
 		if (imgs.length > 0){
 			newShape.imgObj = $(imgs[0]);
 			setSelfDrawingToImageObj(newShape.imgObj);
-		}else{
-			addImgObjToShape(newShape);
-		}
-		
+		}else addImgObjToShape(newShape);
 		var texts = newShape.find('p#text');
-		if (texts.length > 0){
+		if (texts.length > 0)
 			newShape.textObj = $(texts[0]);
-		}else{
+		else
 			addTextObjToShape(newShape);
-		}
-
 		newShape.isHover = function(){
 			return newShape.is(":hover");
-		}
-
-		//add corner shapes and behaviours to they
+		};
 		function addCornerShapes(obj){
 			if (obj.hasCornerShapes != true){
 				obj.hasCornerShapes = true;
-				
 				function updateCornerShape(shapeId){
 					var corner_shape = obj.children( "div#"+shapeId+".corner_shape");
-					if (corner_shape && corner_shape.length){
+					if (corner_shape && corner_shape.length)
 						obj[shapeId] = $(corner_shape[0]);
-					}else{
+					else
 						obj[shapeId] = $('<div id="'+shapeId+'" class="corner_shape"></div>');
-					}
 					obj[shapeId].type = c_cornerShapeType;
 					obj[shapeId].owner = obj;
-					
 					obj[shapeId].color = c_colorsByCorners[shapeId];
-					
 					obj[shapeId].animatedShow = function(){
-						if (obj.animationIsBlocked){
+						if (obj.animationIsBlocked)
 							obj[shapeId].simpleShow();
-						}
-						else{
+						else
 							obj[shapeId].animate({opacity: 1, width: c_cornerShapeHalfSize*2, height: c_cornerShapeHalfSize*2, left: obj[shapeId].animationEndCorner.x, top: obj[shapeId].animationEndCorner.y},c_cornerShapeAnimationDuration);
-						}
-					}
-					
+					};
 					obj[shapeId].animatedHide = function(){
-						if (obj.animationIsBlocked){
+						if (obj.animationIsBlocked)
 							obj[shapeId].simpleHide();
-						}
-						else{
+						else
 							obj[shapeId].animate({opacity: 0, width: 0, height: 0, left: obj[shapeId].animationStartCorner.x, top: obj[shapeId].animationStartCorner.y},c_cornerShapeAnimationDuration);
-						}
-					}
-					
+					};
 					obj[shapeId].simpleShow = function(){
 						obj[shapeId].css({opacity: 1, width: (c_cornerShapeHalfSize*2)+'px', height: c_cornerShapeHalfSize*2+'px', left: obj[shapeId].animationEndCorner.x+'px', top: obj[shapeId].animationEndCorner.y+'px'});
-					}
+					};
 					obj[shapeId].simpleHide = function(){
 						obj[shapeId].css({opacity: 0, width: 0+'px', height: 0+'px', left: obj[shapeId].animationStartCorner.x+'px', top: obj[shapeId].animationStartCorner.y+'px'});
-					}
-				}
-				
+					};
+				};
 				updateCornerShape('left_top');
 				updateCornerShape('left_bottom');
 				updateCornerShape('right_top');
 				updateCornerShape('right_bottom');
-				
 				obj.moveCornerHapesToCorners = function(){
 					function updateCornerShapePos(corner_shape){
 						corner_shape.css({'top': corner_shape.leftTop.y +'px', 'left': corner_shape.leftTop.x +'px'});
-					}
-					
+					};
 					obj.left_top.rightBottom = {x: 0 + c_cornerShapeHalfSize, y: 0 + c_cornerShapeHalfSize};
 					obj.left_top.leftTop = {x: 0 - c_cornerShapeHalfSize, y: 0 - c_cornerShapeHalfSize};
 					obj.left_top.animationStartCorner = obj.left_top.rightBottom;
 					obj.left_top.animationEndCorner = obj.left_top.leftTop;
 					updateCornerShapePos(obj.left_top);
-					
-					
+
 					obj.left_bottom.rightBottom = {x: 0 + c_cornerShapeHalfSize, y: obj.height() + c_cornerShapeHalfSize};
 					obj.left_bottom.leftTop = {x: 0 - c_cornerShapeHalfSize, y: obj.height() - c_cornerShapeHalfSize};
 					obj.left_bottom.animationStartCorner = {x: obj.left_bottom.rightBottom.x, y: obj.left_bottom.leftTop.y};
@@ -543,77 +498,66 @@ area.setBehaviourToShape = function(newShape){
 					obj.right_bottom.animationStartCorner = obj.right_bottom.leftTop;
 					obj.right_bottom.animationEndCorner = obj.right_bottom.leftTop;
 					updateCornerShapePos(obj.right_bottom);
-				}
-				
+				};
 				obj.moveCornerHapesToCorners();
 
 				obj.append(obj.left_top);
 				obj.append(obj.left_bottom);
 				obj.append(obj.right_top);
 				obj.append(obj.right_bottom);
-				
 				obj.resetMustBeShowedStates = function (){
 					obj.left_top.mustBeShowed = false;
 					obj.left_bottom.mustBeShowed = false;
 					obj.right_top.mustBeShowed = false;
 					obj.right_bottom.mustBeShowed = false;
-				}
-				
+				};
 				obj.updateCornerShapesVisibility = function (){
 					function showHideCornerShape(shape){
-						if (shape.mustBeShowed){
+						if (shape.mustBeShowed)
 							shape.animatedShow();
-						}else{
+						else
 							shape.animatedHide();
-						}
 					}
 					showHideCornerShape(obj.left_top);
 					showHideCornerShape(obj.left_bottom);
 					showHideCornerShape(obj.right_top);
 					showHideCornerShape(obj.right_bottom);
-				}
-				
+				};
 				obj.setMustBeShowedByCorner = function (isLeft, isTop){
 					obj.resetMustBeShowedStates();
-					if (isLeft && isTop){
+					if (isLeft && isTop)
 						obj.left_top.mustBeShowed = true;
-					}else if (isLeft && !isTop){
+					else if (isLeft && !isTop)
 						obj.left_bottom.mustBeShowed = true;
-					}else if (!isLeft && isTop){
+					else if (!isLeft && isTop)
 						obj.right_top.mustBeShowed = true;
-					}else if (!isLeft && !isTop){
+					else if (!isLeft && !isTop)
 						obj.right_bottom.mustBeShowed = true;
-					}
 					obj.updateCornerShapesVisibility();
-				}
+				};
 			}
-			
 			obj.showCornerShapes = function(){
 				obj.left_top.animatedShow();
 				obj.left_bottom.animatedShow();
 				obj.right_top.animatedShow();
 				obj.right_bottom.animatedShow();
-			}
+			};
 			obj.hideCornerShapes = function(){
-				
 				obj.left_top.animatedHide();
 				obj.left_bottom.animatedHide();
 				obj.right_top.animatedHide();
 				obj.right_bottom.animatedHide();
-			}
+			};
 			obj.hideCornerShapes();
-			
 			{//set onOnlyClick handlers
 				function setClickBehaviourToCornerShape(cornerShape){
 					cornerShape.onOnlyClick = function(){
-						if (obj.attr("color") == cornerShape.color){
+						if (obj.attr("color") == cornerShape.color)
 							obj.attr("color", c_shapeColor_Default);
-						}
-						else{
+						else
 							obj.attr("color", cornerShape.color);
-						}
-					}
-				}
+					};
+				};
 				setClickBehaviourToCornerShape(obj.left_top);
 				setClickBehaviourToCornerShape(obj.left_bottom);
 				setClickBehaviourToCornerShape(obj.right_top);
@@ -625,7 +569,6 @@ area.setBehaviourToShape = function(newShape){
 					var dw = currentPos.x - currCornerShape.startPos.x;
 					var newW = currCornerShape.ownerStartRect.w - dw;
 					var newX;
-					
 					var isLeft = true;
 					if (newW <= 0){
 						newX = currCornerShape.ownerStartRect.w + currCornerShape.ownerStartRect.x;
@@ -635,12 +578,9 @@ area.setBehaviourToShape = function(newShape){
 						newX = currCornerShape.ownerStartRect.x + dw;
 						newW = currCornerShape.ownerStartRect.w - dw;
 					}
-
-					
 					var dh = currentPos.y - currCornerShape.startPos.y;
 					var newH = currCornerShape.ownerStartRect.h - dh;
 					var newY;
-					
 					var isTop = true;
 					if (newH <= 0){
 						newY = currCornerShape.ownerStartRect.h + currCornerShape.ownerStartRect.y;
@@ -651,19 +591,15 @@ area.setBehaviourToShape = function(newShape){
 						newH = currCornerShape.ownerStartRect.h - dh;
 					}
 					obj.setMustBeShowedByCorner(isLeft, isTop);
-					
 					obj.css({'top': newY+'px', 'left': newX+'px', 'width': newW+'px', 'height': newH+'px'}); //*/
-					
 					obj.moveCornerHapesToCorners();
-				}
+				};
 				obj.left_top.hasInternalMoveHandler = true;
-				
 				obj.left_bottom.internalMoveHandler = function(currentPos){
 					var currCornerShape = obj.left_bottom;
 					var dw = currentPos.x - currCornerShape.startPos.x;
 					var newW = currCornerShape.ownerStartRect.w - dw;
 					var newX;
-					
 					var isLeft = true;
 					if (newW <= 0){
 						newX = currCornerShape.ownerStartRect.w + currCornerShape.ownerStartRect.x;
@@ -673,11 +609,9 @@ area.setBehaviourToShape = function(newShape){
 						newX = currCornerShape.ownerStartRect.x + dw;
 						newW = currCornerShape.ownerStartRect.w - dw;
 					}
-
 					var dh = currentPos.y - currCornerShape.startPos.y;
 					var newH = currCornerShape.ownerStartRect.h + dh;
 					var newY;
-					
 					var isTop = true;
 					if (newH > 0){
 						newY = currCornerShape.ownerStartRect.y;
@@ -687,19 +621,15 @@ area.setBehaviourToShape = function(newShape){
 						newH = Math.abs(newH);
 					}
 					obj.setMustBeShowedByCorner(isLeft, isTop);
-					
 					obj.css({'top': newY+'px', 'left': newX+'px', 'width': newW+'px', 'height': newH+'px'}); //*/
-					
 					obj.moveCornerHapesToCorners();
-				}
+				};
 				obj.left_bottom.hasInternalMoveHandler = true;
-
 				obj.right_top.internalMoveHandler = function(currentPos){
 					var currCornerShape = obj.right_top;
 					var dw = currentPos.x - currCornerShape.startPos.x;
 					var newW = currCornerShape.ownerStartRect.w + dw;
 					var newX;
-					
 					var isLeft = true;
 					if (newW > 0){
 						newX = currCornerShape.ownerStartRect.x;
@@ -708,11 +638,9 @@ area.setBehaviourToShape = function(newShape){
 						newX = currCornerShape.ownerStartRect.x + newW;
 						newW = Math.abs(newW);
 					}
-
 					var dh = currentPos.y - currCornerShape.startPos.y;
 					var newH = currCornerShape.ownerStartRect.h - dh;
 					var newY;
-					
 					var isTop = true;
 					if (newH <= 0){
 						newY = currCornerShape.ownerStartRect.h + currCornerShape.ownerStartRect.y;
@@ -723,19 +651,15 @@ area.setBehaviourToShape = function(newShape){
 						newH = currCornerShape.ownerStartRect.h - dh;
 					}
 					obj.setMustBeShowedByCorner(isLeft, isTop);
-					
 					obj.css({'top': newY+'px', 'left': newX+'px', 'width': newW+'px', 'height': newH+'px'}); //*/
-					
 					obj.moveCornerHapesToCorners();
-				}
+				};
 				obj.right_top.hasInternalMoveHandler = true;
-
 				obj.right_bottom.internalMoveHandler = function(currentPos){
 					var currCornerShape = obj.right_bottom;
 					var dw = currentPos.x - currCornerShape.startPos.x;
 					var newW = currCornerShape.ownerStartRect.w + dw;
 					var newX;
-					
 					var isLeft = true;
 					if (newW > 0){
 						newX = currCornerShape.ownerStartRect.x;
@@ -744,11 +668,9 @@ area.setBehaviourToShape = function(newShape){
 						newX = currCornerShape.ownerStartRect.x + newW;
 						newW = Math.abs(newW);
 					}
-
 					var dh = currentPos.y - currCornerShape.startPos.y;
 					var newH = currCornerShape.ownerStartRect.h + dh;
 					var newY;
-					
 					var isTop = true;
 					if (newH > 0){
 						newY = currCornerShape.ownerStartRect.y;
@@ -758,38 +680,29 @@ area.setBehaviourToShape = function(newShape){
 						newH = Math.abs(newH);
 					}
 					obj.setMustBeShowedByCorner(isLeft, isTop);
-					
 					obj.css({'top': newY+'px', 'left': newX+'px', 'width': newW+'px', 'height': newH+'px'}); //*/
-					
 					obj.moveCornerHapesToCorners();
-				}
+				};
 				obj.right_bottom.hasInternalMoveHandler = true;
 			}
-			
 			obj.setHandlersToCornerShape = function(cornerShape){
-				
 				setDraggedPropertiesToShape(cornerShape);
-				
 				cornerShape.mouseUpHandler = function(e){
 					if (e.button == 0 && cornerShape.isClickedState()){
 						e.preventDefault();
 						if (cornerShape.startPos == cornerShape.lastPos){
 							log(cornerShape.attr('id') + ' only click');
-							if (cornerShape.onOnlyClick){
+							if (cornerShape.onOnlyClick)
 								cornerShape.onOnlyClick();
-							}
-						}else{
-							obj.showCornerShapes();
-						}
+						}else
+						obj.showCornerShapes();
 						cornerShape.resetState();
 						log(cornerShape.attr('id') +' mouseUp OK');
 						obj.animationIsBlocked = false;
 					}
-				}
-
+				};
 				cornerShape.mouseDownHandler = function(e){
 					checkEditorIsOpened();
-
 					if (e.button == 0 && isClickedObject(0)){
 						e.preventDefault();
 						setClickedObject(cornerShape);
@@ -805,45 +718,25 @@ area.setBehaviourToShape = function(newShape){
 						log(cornerShape.attr('id') +" mouseDown OK");
 						obj.animationIsBlocked = true;
 					}
-				}
-				
+				};
 				cornerShape.mouseMoveHandler = function(e){
 					if (cornerShape.isClickedState()){//do create something
 						if (e.which != 1){
 							cornerShape.resetState();
 							return;
 						}
-
 						var currentPos = {x: e.pageX, y: e.pageY};
-						
-						if (vectorLengthPoints(currentPos, cornerShape.startPos) < c_movingLimit 
-							&& cornerShape.clickTrace < c_movingLimit){
+						if (vectorLengthPoints(currentPos, cornerShape.startPos) < c_movingLimit && cornerShape.clickTrace < c_movingLimit)
 							return;
-					}
-					
-					cornerShape.clickTrace += vectorLengthPoints(currentPos, cornerShape.lastPos);
-					
-					e.preventDefault();
-					log(cornerShape.attr('id') +" mouseMove OK");
-					
-					if (cornerShape.hasInternalMoveHandler == true){
-						cornerShape.internalMoveHandler(currentPos);
-					}
-						//--------------------------------------------------------------insert internal move (parent resize/move) handler
-						/*
-						var shapePos = cornerShape.offset();
-						
-						var x = currentPos.x - cornerShape.lastPos.x + shapePos.left;
-						var y = currentPos.y - cornerShape.lastPos.y + shapePos.top;
-						
-						cornerShape.css({'top': y+'px', 'left': x+'px'}); //*/
-						
+						cornerShape.clickTrace += vectorLengthPoints(currentPos, cornerShape.lastPos);
+						e.preventDefault();
+						log(cornerShape.attr('id') +" mouseMove OK");
+						if (cornerShape.hasInternalMoveHandler == true){
+							cornerShape.internalMoveHandler(currentPos);
+						}
 						cornerShape.lastPos = currentPos;
 					}
-				}
-				
-
-				
+				};
 				cornerShape.bind({
 					mouseenter: function(e){},
 					mouseleave: function(e){},
@@ -851,7 +744,7 @@ area.setBehaviourToShape = function(newShape){
 					mousedown: cornerShape.mouseDownHandler,
 					mouseup: cornerShape.mouseUpHandler
 				});
-			}
+			};
 			obj.setHandlersToCornerShape(obj.left_top);
 			obj.setHandlersToCornerShape(obj.left_bottom);
 			obj.setHandlersToCornerShape(obj.right_top);
