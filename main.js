@@ -77,6 +77,7 @@ $(document).ready(function(){
 	var body = $(document.body);
 	body.scrollLeft(3500);
 	body.scrollTop(2500);
+	body.mousedown(function(e){if(e.button==1)return false});
 
 	var docWindow = $(window); 
 
@@ -163,8 +164,9 @@ $(document).ready(function(){
 			}
 			imageEditor.doNotEdited = false;
 		};
+
 		imageEditor.mouseDownHandler = function (e){
-			if ((e.button !== 0 && e.button !== 2 && e.button !== 1) || canvas.pendingButton){
+			if ((e.button !== 0 && e.button !== 1 && e.button !== 2) || canvas.pendingButton){
 				canvas.clickedObject = false;
 				canvas.pendingButton = false;
 			}else{
@@ -182,6 +184,7 @@ $(document).ready(function(){
 			  canvas.clearShape.remove();
 			  canvas.clearShape = false;
 			}
+			return false;
 		};
 		imageEditor.internalMouseUpHandler = function(e){
 			if (canvas.pendingButton === 0){
@@ -194,127 +197,116 @@ $(document).ready(function(){
 					imageEditor.doNotEdited = false;
 				}
 			}else{
-					//clear canvas rect 
-					if (!canvas.clearShape) return;
-					var _w = canvas.clearShape.width();
-					var _h = canvas.clearShape.height();
-					var _x = canvas.clearShape.position().left;
-					var _y = canvas.clearShape.position().top;
-					if (canvas.pendingButton == 1){
-						ctx.clearRect(_x, _y, _w, _h);
-						imageEditor.doNotEdited = false;
-						canvas.clearShape.remove();
-						canvas.clearShape = false;
-					}else{
-						var imgData=ctx.getImageData(_x, _y, _w, _h);
-						canvas.clearShape.image = $('<img id="copiedImage" src="" style="width:100%; height:100%;"/>');
-						canvas.clearShape.append(canvas.clearShape.image);
-						
-						canvas.clearShape.image.bind({
-							mousemove: function(e){e.preventDefault();}});
-						
-						canvas.clearShape.wasMoving = false;
+				if (!canvas.clearShape) return;
+				var _w = canvas.clearShape.width();
+				var _h = canvas.clearShape.height();
+				var _x = canvas.clearShape.position().left;
+				var _y = canvas.clearShape.position().top;
+				if (canvas.pendingButton == 1){
+					imageEditor.doNotEdited = false;
 
-						var oCanvas = document.createElement("canvas");
-						oCanvas.width = imgData.width;
-						oCanvas.height = imgData.height;
-						var oCtx = oCanvas.getContext("2d");
-						oCtx.putImageData(imgData, 0, 0);
-						canvas.clearShape.image.attr('src',oCanvas.toDataURL('image/png'));
-						canvas.clearShape.selectMode = true;
-						
-						canvas.clearShape.mouseMoveHandler = function(e){
-							log("clearShape mousemove");
-							if (!canvas.clickedObject || (e.button !== canvas.clearShape.pendingButton)){
-								canvas.clearShape.pendingButton = false;
-								canvas.clickedObject = false;
-							}else{
-								e.stopPropagation();
-								if (e.ctrlKey !== true && !canvas.clearShape.wasMoving){
-									ctx.clearRect(
-										canvas.clearShape.position().left, canvas.clearShape.position().top,
-										canvas.clearShape.width(), canvas.clearShape.height());
-								}
-								canvas.clearShape.wasMoving = true;
+					ctx.clearRect(_x, _y, _w, _h);
 
-								canvas.clearShape.endPos = {x: e.screenX, y: e.screenY};
-								
-								var newPos = {
-									x:canvas.clearShape.pos.x + canvas.clearShape.endPos.x - canvas.clearShape.startPos.x,
-									y:canvas.clearShape.pos.y + canvas.clearShape.endPos.y - canvas.clearShape.startPos.y
-								};
+					canvas.clearShape.remove();
+					canvas.clearShape = false;
+				}else{
+					var imgData=ctx.getImageData(_x, _y, _w, _h);
+					
+					canvas.clearShape.image = $('<img id="copiedImage" src="" style="width:100%; height:100%;"/>');
+					canvas.clearShape.append(canvas.clearShape.image);
+					
+					canvas.clearShape.image.bind({mousemove: function(e){e.preventDefault();}});
+					
+					canvas.clearShape.wasMoving = false;
 
-								canvas.clearShape.css({'top': newPos.y+'px', 'left': newPos.x+'px'}); 
-							}
-							
-						};
-						canvas.clearShape.mouseUpHandler = function(e){
-							log("clearShape mouseup");
+					var oCanvas = document.createElement("canvas");
+					oCanvas.width = imgData.width;
+					oCanvas.height = imgData.height;
+					
+					var oCtx = oCanvas.getContext("2d");
+					oCtx.putImageData(imgData, 0, 0);
+					
+					canvas.clearShape.image.attr('src',oCanvas.toDataURL('image/png'));
+					canvas.clearShape.selectMode = true;
+					
+					canvas.clearShape.mouseMoveHandler = function(e){
+						log("clearShape mousemove");
+						if (!canvas.clickedObject || (e.button !== canvas.clearShape.pendingButton)){
+							canvas.clearShape.pendingButton = false;
+							canvas.clickedObject = false;
+						}else{
+							e.stopPropagation();
+							if (e.ctrlKey !== true && !canvas.clearShape.wasMoving)
+								ctx.clearRect(
+									canvas.clearShape.position().left, canvas.clearShape.position().top,
+									canvas.clearShape.width(), canvas.clearShape.height());
+							canvas.clearShape.wasMoving = true;
+							canvas.clearShape.endPos = {x: e.screenX, y: e.screenY};
+							var newPos = {
+								x:canvas.clearShape.pos.x + canvas.clearShape.endPos.x - canvas.clearShape.startPos.x,
+								y:canvas.clearShape.pos.y + canvas.clearShape.endPos.y - canvas.clearShape.startPos.y
+							};
+							canvas.clearShape.css({'top': newPos.y+'px', 'left': newPos.x+'px'}); 
+						}
+					};
+					canvas.clearShape.mouseUpHandler = function(e){
+						log("clearShape mouseup");
+						canvas.clickedObject = false;
+						canvas.clearShape.pendingButton = false;
+					};
+					canvas.clearShape.mouseDownHandler = function(e){
+						log("clearShape mousedown");
+						if ((e.button !== 0 && e.button !== 1) || canvas.clearShape.pendingButton){
 							canvas.clickedObject = false;
 							canvas.clearShape.pendingButton = false;
-
-							canvas.clickedObject = false;
-						};
-						canvas.clearShape.mouseDownHandler = function(e){
-							log("clearShape mousedown");
-							if ((e.button !== 0 && e.button !== 1) || canvas.clearShape.pendingButton){
-								
-								canvas.clickedObject = false;
-								canvas.clearShape.pendingButton = false;
-								
-							}else{
-								e.stopPropagation();
-								
-								canvas.clearShape.pos = {x: canvas.clearShape.position().left, y: canvas.clearShape.position().top};
-								canvas.clearShape.startPos = {x: e.screenX, y: e.screenY};
-								canvas.clearShape.endPos = canvas.clearShape.startPos;
-								canvas.clearShape.pendingButton = e.button;
-
-								canvas.clickedObject = canvas.clearShape;
-							}
-						};
-						canvas.clearShape.bind({
-							//mousemove: canvas.clearShape.mouseMoveHandler,
-							//mouseup: canvas.clearShape.mouseUpHandler,
-							mousedown: canvas.clearShape.mouseDownHandler
-						});
-						//add image to add behaviour to clearShape
-					}
+						}else{
+							e.stopPropagation();
+							canvas.clearShape.pos = {x: canvas.clearShape.position().left, y: canvas.clearShape.position().top};
+							canvas.clearShape.startPos = {x: e.screenX, y: e.screenY};
+							canvas.clearShape.endPos = canvas.clearShape.startPos;
+							canvas.clearShape.pendingButton = e.button;
+							canvas.clickedObject = canvas.clearShape;
+						}
+					};
+					canvas.clearShape.bind({
+						mousedown: canvas.clearShape.mouseDownHandler
+					});
 				}
 			}
-			imageEditor.mouseUpHandler = function (e){
-				if (!canvas.clickedObject){
-					clickedObject.pendingButton = false;
-					return;
-				}
-				
-				if (canvas.clickedObject === canvas.clearShape){
-					canvas.clearShape.mouseUpHandler(e);
-					return;
-				} else if (canvas.clickedObject){
-					canvas.clickedObject = false;
-					imageEditor.internalMouseUpHandler(e);
-					canvas.pendingButton = false;
-				}
-			};
-			imageEditor.bind({
-				mousedown: imageEditor.mouseDownHandler,
-				mousemove: imageEditor.mouseMoveHandler,
-				mouseup: imageEditor.mouseUpHandler
-			});
-			if (obj.imgObj.hasPicture()){
-				var imgObjOfset = obj.imgObj.offset();
-				var imgObjSize = {w:obj.imgObj.width(),h:obj.imgObj.height()};
-				imageEditor.css({'top': imgObjOfset.top+'px', 'left': imgObjOfset.left+'px', 'width': imgObjSize.w+'px', 'height': imgObjSize.h+'px'});
-				if (objSize.w > editorSize.w || objSize.h > editorSize.h){
-					obj.imgObj.drawToCanvasScaled(ctx, editorSize);
-				}else{
-					obj.imgObj.drawToCanvas(ctx);
-				}
+		}
+		imageEditor.mouseUpHandler = function (e){
+			if (!canvas.clickedObject){
+				clickedObject.pendingButton = false;
+				return;
+			}
+			
+			if (canvas.clickedObject === canvas.clearShape){
+				canvas.clearShape.mouseUpHandler(e);
+				return;
+			} else if (canvas.clickedObject){
+				canvas.clickedObject = false;
+				imageEditor.internalMouseUpHandler(e);
+				canvas.pendingButton = false;
+			}
+		};
+		imageEditor.bind({
+			mousedown: imageEditor.mouseDownHandler,
+			mousemove: imageEditor.mouseMoveHandler,
+			mouseup: imageEditor.mouseUpHandler
+		});
+		if (obj.imgObj.hasPicture()){
+			var imgObjOfset = obj.imgObj.offset();
+			var imgObjSize = {w:obj.imgObj.width(),h:obj.imgObj.height()};
+			imageEditor.css({'top': imgObjOfset.top+'px', 'left': imgObjOfset.left+'px', 'width': imgObjSize.w+'px', 'height': imgObjSize.h+'px'});
+			if (objSize.w > editorSize.w || objSize.h > editorSize.h){
+				obj.imgObj.drawToCanvasScaled(ctx, editorSize);
 			}else{
-				imageEditor.css({'top': obj.offset().top+'px', 'left': obj.offset().left+'px', 'width': obj.width()+'px', 'height': obj.height()+'px'});
+				obj.imgObj.drawToCanvas(ctx);
 			}
-			imageEditor.animate({top: editorPos.y, left: editorPos.x, width: editorSize.w, height: editorSize.h}, 200);
+		}else{
+			imageEditor.css({'top': obj.offset().top+'px', 'left': obj.offset().left+'px', 'width': obj.width()+'px', 'height': obj.height()+'px'});
+		}
+		imageEditor.animate({top: editorPos.y, left: editorPos.x, width: editorSize.w, height: editorSize.h}, 200);
 //		imageEditor.css({'top':editorPos.y+'px', 'left':editorPos.x+'px', 'width':editorSize.w+'px', 'height': editorSize.h+'px'});
 imageEditor.doNotEdited = true;
 imageEditor.saveToObject = function(){
