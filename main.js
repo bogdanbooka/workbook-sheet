@@ -753,6 +753,7 @@ $(document).ready(function(){
 						isTop = false;
 					}else if (newH <= 0){
 						newY = currCornerShape.ownerStartRect.y + newH;
+						newH = Math.abs(newH);
 					}
 					obj.setMustBeShowedByCorner(isLeft, isTop);
 					
