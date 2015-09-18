@@ -126,8 +126,7 @@ $(document).ready(function(){
 			if (canvas.clickedObject === canvas.clearShape){
 				canvas.clearShape.mouseMoveHandler(e);
 				return;
-			}
-			else if (!canvas.clickedObject || (e.button !== 0 && e.button !== 2 && e.button !== 1) || canvas.pendingButton !== e.button){
+			} else if (!canvas.clickedObject || (e.button !== 0 && e.button !== 2 && e.button !== 1) || canvas.pendingButton !== e.button){
 				canvas.startPos = 0;
 				canvas.endPos = 0;
 				canvas.clickedObject = false;
@@ -164,7 +163,6 @@ $(document).ready(function(){
 			}
 			imageEditor.doNotEdited = false;
 		};
-
 		imageEditor.mouseDownHandler = function (e){
 			if ((e.button !== 0 && e.button !== 1 && e.button !== 2) || canvas.pendingButton){
 				canvas.clickedObject = false;
@@ -204,31 +202,22 @@ $(document).ready(function(){
 				var _y = canvas.clearShape.position().top;
 				if (canvas.pendingButton == 1){
 					imageEditor.doNotEdited = false;
-
 					ctx.clearRect(_x, _y, _w, _h);
-
 					canvas.clearShape.remove();
 					canvas.clearShape = false;
 				}else{
 					var imgData=ctx.getImageData(_x, _y, _w, _h);
-					
 					canvas.clearShape.image = $('<img id="copiedImage" src="" style="width:100%; height:100%;"/>');
 					canvas.clearShape.append(canvas.clearShape.image);
-					
 					canvas.clearShape.image.bind({mousemove: function(e){e.preventDefault();}});
-					
 					canvas.clearShape.wasMoving = false;
-
 					var oCanvas = document.createElement("canvas");
 					oCanvas.width = imgData.width;
 					oCanvas.height = imgData.height;
-					
 					var oCtx = oCanvas.getContext("2d");
 					oCtx.putImageData(imgData, 0, 0);
-					
 					canvas.clearShape.image.attr('src',oCanvas.toDataURL('image/png'));
 					canvas.clearShape.selectMode = true;
-					
 					canvas.clearShape.mouseMoveHandler = function(e){
 						log("clearShape mousemove");
 						if (!canvas.clickedObject || (e.button !== canvas.clearShape.pendingButton)){
@@ -298,21 +287,17 @@ $(document).ready(function(){
 			var imgObjOfset = obj.imgObj.offset();
 			var imgObjSize = {w:obj.imgObj.width(),h:obj.imgObj.height()};
 			imageEditor.css({'top': imgObjOfset.top+'px', 'left': imgObjOfset.left+'px', 'width': imgObjSize.w+'px', 'height': imgObjSize.h+'px'});
-			if (objSize.w > editorSize.w || objSize.h > editorSize.h){
+			if (objSize.w > editorSize.w || objSize.h > editorSize.h)
 				obj.imgObj.drawToCanvasScaled(ctx, editorSize);
-			}else{
-				obj.imgObj.drawToCanvas(ctx);
-			}
-		}else{
+			else 
+			  obj.imgObj.drawToCanvas(ctx);
+		}else
 			imageEditor.css({'top': obj.offset().top+'px', 'left': obj.offset().left+'px', 'width': obj.width()+'px', 'height': obj.height()+'px'});
-		}
 		imageEditor.animate({top: editorPos.y, left: editorPos.x, width: editorSize.w, height: editorSize.h}, 200);
-
 		imageEditor.doNotEdited = true;
 		imageEditor.saveToObject = function(){
 			function removeEditor(){
-				if (imageEditor.doNotEdited){
-				}else{
+				if (!imageEditor.doNotEdited){
 					var dataURL = canvas.toDataURL('image/png');
 					obj.imgObj.attr('src',dataURL);
 				}
@@ -321,8 +306,13 @@ $(document).ready(function(){
 				area.editShapeState = false;
 			}
 			if (obj.imgObj.hasPicture()){
+			  if (canvas.clearShape && canvas.clearShape.wasMoving){
+          ctx.drawImage(canvas.clearShape.image[0], canvas.clearShape.position().left, canvas.clearShape.position().top);
+          canvas.clearShape.remove();
+          canvas.clearShape = false;
+        }
 				imageEditor.animate({top: obj.imgObj.offset().top, left: obj.imgObj.offset().left, width: obj.imgObj.width(), height: obj.imgObj.height()}, 200, removeEditor);
-			}	else {
+			}else{
 				imageEditor.animate({top: obj.offset().top, left: obj.offset().left, width: obj.width(), height: obj.height()}, 200, removeEditor);
 			}
 		};
