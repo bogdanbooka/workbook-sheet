@@ -11,7 +11,7 @@ $(document).ready(function(){
 	var c_movingLimit = 5;
 	var c_cornerShapeHalfSize = 8;
 	var c_cornerShapeAnimationDuration = 100;
-	var c_minShapeSize = {h: 40, w: 40};
+	var c_minShapeSize = {h: 10, w: 10};
 	var c_shapeWrongState = 'wrong';
 	var c_shapeCreateState = 'create';
 	var c_shapeSelectingState = 'selecting';
@@ -209,7 +209,6 @@ $(document).ready(function(){
 					var imgData=ctx.getImageData(_x, _y, _w, _h);
 					canvas.clearShape.image = $('<img id="copiedImage" src="" style="width:100%; height:100%;"/>');
 					canvas.clearShape.append(canvas.clearShape.image);
-					canvas.clearShape.image.bind({mousemove: function(e){e.preventDefault();}});
 					canvas.clearShape.wasMoving = false;
 					var oCanvas = document.createElement("canvas");
 					oCanvas.width = imgData.width;
@@ -219,6 +218,7 @@ $(document).ready(function(){
 					canvas.clearShape.image.attr('src',oCanvas.toDataURL('image/png'));
 					canvas.clearShape.selectMode = true;
 					canvas.clearShape.mouseMoveHandler = function(e){
+					  if (e.button === 1){ e.preventDefault(); return false;}
 						log("clearShape mousemove");
 						if (!canvas.clickedObject || (e.button !== canvas.clearShape.pendingButton)){
 							canvas.clearShape.pendingButton = false;
@@ -256,7 +256,13 @@ $(document).ready(function(){
 							canvas.clearShape.pendingButton = e.button;
 							canvas.clickedObject = canvas.clearShape;
 						}
+						return false;
 					};
+					canvas.clearShape.image.bind({
+					  mousemove: function(e){e.preventDefault();}, 
+					  mosedown: function(e){return canvas.clearShape.mouseDownHandler(e)}
+					});
+
 					canvas.clearShape.bind({
 						mousedown: canvas.clearShape.mouseDownHandler
 					});
