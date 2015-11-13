@@ -1,7 +1,7 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
 function log(obj){
-	/*console.log(obj);//*/
+	console.log(obj);//*/
 }
 
 $(document).ready(function(){
@@ -121,7 +121,11 @@ $(document).ready(function(){
 			editorSize.w = windowSize.w*c_imageEditorRelativeSize;
 			editorSize.h = editorSize.w/(objSize.w/objSize.h);
 		}
-		var editorPos = {x: (windowSize.w - editorSize.w) / 2 + body.scrollLeft(), y: (windowSize.h - editorSize.h) / 2 + body.scrollTop()};
+		if (isChrome) {
+			var editorPos = {x: (windowSize.w - editorSize.w) / 2 + body.scrollLeft(), y: (windowSize.h - editorSize.h) / 2 + body.scrollTop()};
+		}else if (isFirefox) {
+			var editorPos = {x: (windowSize.w - editorSize.w) / 2 + window.scrollX, y: (windowSize.h - editorSize.h) / 2 + window.scrollY};
+		};
 		var imageEditor = $('<div id="canvasHolder" style="position:absolute; z-index:'+topZOrder()
 			+';"><canvas id="imageEditor" width="'+editorSize.w
 			+'" height="'+editorSize.h+'" style="cursor: crosshair; max-width: 100%; max-height: 100%;"></canvas></div>');
