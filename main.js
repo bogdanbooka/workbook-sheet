@@ -1,7 +1,7 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
 function log(obj){
-	console.log(obj);//*/
+	/*console.log(obj);//*/
 }
 
 $(document).ready(function(){
