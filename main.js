@@ -1,7 +1,7 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
 function log(obj){
-	/*console.log(obj);//*/
+	console.log(obj);//*/
 }
 
 $(document).ready(function(){
@@ -390,7 +390,11 @@ $(document).ready(function(){
 		textEditor.val(objText);
 		area.editShapeState = true;
 	}
-	function checkEditorIsOpened(){ if(area.editShapeState) area.currentActiveEditor.saveToObject();}
+	function checkEditorIsOpened(){ 
+		if(area.editShapeState) {
+			area.currentActiveEditor.saveToObject();
+		}
+	}
 	var area = $('#drag_area');
 	area.isPressed = false;
 	area.type = c_areaType;
@@ -941,6 +945,12 @@ $(document).ready(function(){
 		mouseenter: function(e){},
 		mouseleave: function(e){},
 		mousemove: function(e){
+			if(area.editShapeState) {
+				if (area.currentActiveEditor.mouseMoveHandler)
+					area.currentActiveEditor.mouseMoveHandler(e);
+			}
+
+			log(clickedObject != 0);
 			if (area.isClickedState()){//do create new shape
 				if (e.which != 1 && e.which != 2 && e.which != 3){
 					area.resetState();
@@ -1029,6 +1039,10 @@ $(document).ready(function(){
 			}
 		},
 		mouseup: function(e){
+			if(area.editShapeState) {
+				if (area.currentActiveEditor.mouseUpHandler)
+					area.currentActiveEditor.mouseUpHandler(e);
+			}
 			if (e.button == 0 || e.button == 1 || e.button == 2){
 				if (area.isClickedState()){
 					e.preventDefault();
