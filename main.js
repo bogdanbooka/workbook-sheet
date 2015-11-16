@@ -1,7 +1,7 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
 function log(obj){
-	console.log(obj);//*/
+	/*console.log(obj);//*/
 }
 
 $(document).ready(function(){
@@ -196,11 +196,12 @@ $(document).ready(function(){
 				canvas.pendingButton = e.button;
 			}
 			if (canvas.clearShape){
-			  //copy clearShape image to current place
-			  if (canvas.clearShape.wasMoving)
-			  	ctx.drawImage(canvas.clearShape.image[0], canvas.clearShape.position().left, canvas.clearShape.position().top);
-			  canvas.clearShape.remove();
-			  canvas.clearShape = false;
+				//copy clearShape image to current place
+				if (canvas.clearShape.image){
+					ctx.drawImage(canvas.clearShape.image[0], canvas.clearShape.position().left, canvas.clearShape.position().top);
+				}
+				canvas.clearShape.remove();
+				canvas.clearShape = false;
 			}
 			return false;
 		};
@@ -215,7 +216,9 @@ $(document).ready(function(){
 					imageEditor.doNotEdited = false;
 				}
 			}else{
-				if (!canvas.clearShape) return;
+				if (!canvas.clearShape){
+					return;
+				};
 				var _w = canvas.clearShape.width();
 				var _h = canvas.clearShape.height();
 				var _x = canvas.clearShape.position().left;
@@ -236,19 +239,23 @@ $(document).ready(function(){
 					var oCtx = oCanvas.getContext("2d");
 					oCtx.putImageData(imgData, 0, 0);
 					canvas.clearShape.image.attr('src',oCanvas.toDataURL('image/png'));
+
+					ctx.clearRect(
+						canvas.clearShape.position().left, canvas.clearShape.position().top,
+						canvas.clearShape.width(), canvas.clearShape.height());
+
 					canvas.clearShape.selectMode = true;
+
 					canvas.clearShape.mouseMoveHandler = function(e){
-					  if (e.button === 1){ e.preventDefault(); return false;}
+						if (e.button === 1){ 
+							e.preventDefault(); return false;
+						};
 						log("clearShape mousemove");
 						if (!canvas.clickedObject || (e.button !== canvas.clearShape.pendingButton)){
 							canvas.clearShape.pendingButton = false;
 							canvas.clickedObject = false;
 						}else{
 							e.stopPropagation();
-							if (e.ctrlKey !== true && !canvas.clearShape.wasMoving)
-								ctx.clearRect(
-									canvas.clearShape.position().left, canvas.clearShape.position().top,
-									canvas.clearShape.width(), canvas.clearShape.height());
 							canvas.clearShape.wasMoving = true;
 							canvas.clearShape.endPos = {x: e.screenX, y: e.screenY};
 							var newPos = {
@@ -256,7 +263,7 @@ $(document).ready(function(){
 								y:canvas.clearShape.pos.y + canvas.clearShape.endPos.y - canvas.clearShape.startPos.y
 							};
 							canvas.clearShape.css({'top': newPos.y+'px', 'left': newPos.x+'px'}); 
-						}
+						};
 					};
 					canvas.clearShape.mouseUpHandler = function(e){
 						log("clearShape mouseup");
@@ -275,12 +282,16 @@ $(document).ready(function(){
 							canvas.clearShape.endPos = canvas.clearShape.startPos;
 							canvas.clearShape.pendingButton = e.button;
 							canvas.clickedObject = canvas.clearShape;
+							if (e.ctrlKey == true && e.button === 0){
+								ctx.drawImage(canvas.clearShape.image[0], canvas.clearShape.position().left, canvas.clearShape.position().top);
+							}
+
 						}
 						return false;
 					};
 					canvas.clearShape.image.bind({
-					  mousemove: function(e){e.preventDefault();}, 
-					  mosedown: function(e){return canvas.clearShape.mouseDownHandler(e)}
+						mousemove: function(e){e.preventDefault();}, 
+						mosedown: function(e){return canvas.clearShape.mouseDownHandler(e)}
 					});
 
 					canvas.clearShape.bind({
@@ -316,9 +327,9 @@ $(document).ready(function(){
 			if (objSize.w > editorSize.w || objSize.h > editorSize.h)
 				obj.imgObj.drawToCanvasScaled(ctx, editorSize);
 			else 
-			  obj.imgObj.drawToCanvas(ctx);
+				obj.imgObj.drawToCanvas(ctx);
 		}else
-			imageEditor.css({'top': obj.offset().top+'px', 'left': obj.offset().left+'px', 'width': obj.width()+'px', 'height': obj.height()+'px'});
+		imageEditor.css({'top': obj.offset().top+'px', 'left': obj.offset().left+'px', 'width': obj.width()+'px', 'height': obj.height()+'px'});
 		imageEditor.animate({top: editorPos.y, left: editorPos.x, width: editorSize.w, height: editorSize.h}, 200);
 		imageEditor.doNotEdited = true;
 		imageEditor.saveToObject = function(){
@@ -332,11 +343,11 @@ $(document).ready(function(){
 				area.editShapeState = false;
 			}
 			if (obj.imgObj.hasPicture()){
-			  if (canvas.clearShape && canvas.clearShape.wasMoving){
-          ctx.drawImage(canvas.clearShape.image[0], canvas.clearShape.position().left, canvas.clearShape.position().top);
-          canvas.clearShape.remove();
-          canvas.clearShape = false;
-        }
+				if (canvas.clearShape && canvas.clearShape.wasMoving){
+					ctx.drawImage(canvas.clearShape.image[0], canvas.clearShape.position().left, canvas.clearShape.position().top);
+					canvas.clearShape.remove();
+					canvas.clearShape = false;
+				}
 				imageEditor.animate({top: obj.imgObj.offset().top, left: obj.imgObj.offset().left, width: obj.imgObj.width(), height: obj.imgObj.height()}, 200, removeEditor);
 			}else{
 				imageEditor.animate({top: obj.offset().top, left: obj.offset().left, width: obj.width(), height: obj.height()}, 200, removeEditor);
