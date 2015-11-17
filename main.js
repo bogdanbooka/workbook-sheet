@@ -828,18 +828,19 @@ $(document).ready(function(){
 		setDraggedPropertiesToShape(newShape);
 		newShape.mouseUpHandler = function(e){
 			newShape.copyMode = false;
-			if (e.button != newShape.pendingButton) return;
+			var evButton = eventButton(e);
+			if (evButton !== newShape.pendingButton) return;
 			if (!newShape.isClickedState()) return;
-			if (e.button == 0 || e.button == 2){
+			if (evButton === c_left_mouse || evButton === c_right_mouse){
 				if (newShape.isHover()) newShape.showCornerShapes();
 				e.preventDefault();
 				if (newShape.startPos == newShape.lastPos){
 					log(newShape.attr('id') + ' only click');
 					//change Z order
 					setLastZOrderToShape(newShape);
-					if (e.button == 0)
+					if (evButton === c_left_mouse)
 						showTextEditorForObject(newShape);
-					else if (e.button == 2)
+					else if (evButton === c_right_mouse)
 						showPicEditorForObject(newShape);
 				}
 				newShape.resetState();
@@ -849,13 +850,13 @@ $(document).ready(function(){
 			}
 			newShape.animationIsBlocked = false;
 			if (newShape.clickTrace > c_movingLimit) return;
-			if (e.button == 1){
+			if (evButton === c_left_mouse){
 				e.preventDefault();
 				newShape.resetState();
 				log(newShape.attr('id') +' remove OK');
 				removeFromZOrderedShapes(newShape);
 				newShape.remove();
-			}else if (e.button == 2){
+			}else if (evButton === c_right_mouse){
 				e.preventDefault();
 				newShape.resetState();
 				log(newShape.attr('id') +' right click OK');
@@ -868,7 +869,7 @@ $(document).ready(function(){
 				e.preventDefault();
 				setClickedObject(newShape);
 				newShape.isPressed = true;
-				newShape.pendingButton = e.button;
+				newShape.pendingButton = eventButton(e);
 				newShape.copyMode = e.ctrlKey == true;///////////////////////////
 				newShape.startPos = {x: e.pageX, y: e.pageY};
 				newShape.lastPos = newShape.startPos;
@@ -878,7 +879,8 @@ $(document).ready(function(){
 		};
 		newShape.mouseMoveHandler = function(e){
 			if (newShape.isClickedState()){
-				if (e.which != newShape.pendingButton + 1){
+				if ((isChrome && (e.which != newShape.pendingButton + 1))
+					|| (isFirefox && (eventButton(e) != newShape.pendingButton))){
 					newShape.resetState();
 					return;
 				}
@@ -984,7 +986,8 @@ $(document).ready(function(){
 
 				e.preventDefault();
 
-				if ((isChrome && e.which === 2) || (isFirefox && e.buttons === 4)){
+				var evButton = eventButton(e);
+				if ((evButton === c_middle_mouse) || (evButton === c_middle_mouse)){
 					var currentPos = {top:e.pageY, left:e.pageX};
 
 					var dx = currentPos.left - area.lastPos.left;
@@ -1066,8 +1069,10 @@ $(document).ready(function(){
 			if(area.editShapeState) {
 				if (area.currentActiveEditor.mouseUpHandler)
 					area.currentActiveEditor.mouseUpHandler(e);
+				return;
 			}
-			if (e.button == 0 || e.button == 1 || e.button == 2){
+			var evButton = eventButton(e);
+			if (evButton === c_left_mouse || evButton === c_right_mouse || evButton == c_middle_mouse){
 				if (area.isClickedState()){
 					e.preventDefault();
 					if (area.processedShape){
@@ -1078,9 +1083,9 @@ $(document).ready(function(){
 							}
 							case c_shapeCreateState:{//add handlers for moving edit resize
 								area.setBehaviourToShape(area.processedShape);
-								if (e.button == 0)
+								if (evButton == c_left_mouse)
 									showTextEditorForObject(area.processedShape);
-								else if (e.button == 2)
+								else if (evButton == c_right_mouse)
 									showPicEditorForObject(area.processedShape);
 								break;
 							}
@@ -1119,7 +1124,8 @@ $(document).ready(function(){
 		},
 		mousedown: function(e){
 			checkEditorIsOpened();
-			if ((e.button == 0 || e.button == 1 || e.button == 2) && isClickedObject(0)){
+			var evButton = eventButton(e);
+			if ((evButton === c_left_mouse || evButton === c_right_mouse || evButton == c_middle_mouse) && isClickedObject(0)){
 				e.preventDefault();
 				area.setClickedState(e);
 				log(e);
