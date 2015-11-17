@@ -850,7 +850,7 @@ $(document).ready(function(){
 			}
 			newShape.animationIsBlocked = false;
 			if (newShape.clickTrace > c_movingLimit) return;
-			if (evButton === c_left_mouse){
+			if (evButton === c_middle_mouse){
 				e.preventDefault();
 				newShape.resetState();
 				log(newShape.attr('id') +' remove OK');
@@ -987,7 +987,7 @@ $(document).ready(function(){
 				e.preventDefault();
 
 				var evButton = eventButton(e);
-				if ((evButton === c_middle_mouse) || (evButton === c_middle_mouse)){
+				if (evButton === c_middle_mouse){
 					var currentPos = {top:e.pageY, left:e.pageX};
 
 					var dx = currentPos.left - area.lastPos.left;
