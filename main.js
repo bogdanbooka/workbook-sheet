@@ -1,7 +1,7 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
 function log(obj){
-	/*console.log(obj);//*/
+	//console.log(obj);//*/
 }
 
 $(document).ready(function(){
@@ -12,32 +12,32 @@ $(document).ready(function(){
 
 	var body = $(document.body);
 
-	if (isChrome) {
-		var c_left_mouse = 0;
-		var c_middle_mouse = 1;
-		var c_right_mouse = 2;
+	var c_left_mouse = 1;
+	var c_middle_mouse = 4;
+	var c_right_mouse = 2;
 
+	if (isChrome) {
 		body.scrollLeft(3500);
 		body.scrollTop(2500);
 	}
 	else{
-		var c_left_mouse = 1;
-		var c_middle_mouse = 4;
-		var c_right_mouse = 2;
-
 		window.scrollTo(3500, 2500);
-	}
-	function eventButton(e)
+	};
+	function mousedownEventButton(e)
 	{
-		if (isChrome) {
-			return e.button;
-		}else if (isFirefox) {
-			return e.buttons;
-		};
+		return e.buttons;
+	};
+	function mousemoveEventButton(e)
+	{
+		return e.buttons;
+	};
+	function mouseupEventButton(e)
+	{
+		return e.button === 0 ? c_left_mouse : e.button === 2 ? c_right_mouse : e.button === 1 ? c_middle_mouse : -1;
 	};
 
 	body.mousedown(function(e){
-		if(eventButton(e) == c_middle_mouse) return false;
+		if(mousedownEventButton(e) == c_middle_mouse) return false;
 	});
 
 
@@ -153,9 +153,9 @@ $(document).ready(function(){
 			return Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
 		}
 		imageEditor.mouseMoveHandler = function (e){
-			log("imageEditor.mouseMoveHandler :" + eventButton(e))
+			log("imageEditor.mouseMoveHandler :" + mousemoveEventButton(e))
 			function isInvalidMove(e){
-				var eButton = eventButton(e);
+				var eButton = mousemoveEventButton(e);
 				var buttonIsInvalid = (eButton !== c_left_mouse && eButton !== c_right_mouse && eButton !== c_middle_mouse) || canvas.pendingButton !== eButton;
 				return !canvas.clickedObject || buttonIsInvalid;
 			};
@@ -203,9 +203,9 @@ $(document).ready(function(){
 			imageEditor.doNotEdited = false;
 		};
 		imageEditor.mouseDownHandler = function (e){
-			log("imageEditor.mouseDownHandler :" + eventButton(e))
+			log("imageEditor.mouseDownHandler :" + mousedownEventButton(e))
 
-			var eButton = eventButton(e);
+			var eButton = mousedownEventButton(e);
 			if ((eButton !== c_left_mouse && eButton !== c_right_mouse && eButton !== c_middle_mouse) || canvas.pendingButton){
 				canvas.clickedObject = false;
 				canvas.pendingButton = false;
@@ -269,7 +269,7 @@ $(document).ready(function(){
 					canvas.clearShape.selectMode = true;
 
 					canvas.clearShape.mouseMoveHandler = function(e){
-						var evButton = eventButton(e);
+						var evButton = mousemoveEventButton(e);
 						if (evButton === c_middle_mouse){ 
 							e.preventDefault(); return false;
 						};
@@ -295,7 +295,7 @@ $(document).ready(function(){
 					};
 					canvas.clearShape.mouseDownHandler = function(e){
 						log("clearShape mousedown");
-						var evButton = eventButton(e);
+						var evButton = mousedownEventButton(e);
 						if ((evButton !== c_left_mouse && evButton !== c_middle_mouse) || canvas.clearShape.pendingButton){
 							canvas.clickedObject = false;
 							canvas.clearShape.pendingButton = false;
@@ -743,7 +743,7 @@ $(document).ready(function(){
 			obj.setHandlersToCornerShape = function(cornerShape){
 				setDraggedPropertiesToShape(cornerShape);
 				cornerShape.mouseUpHandler = function(e){
-					if (eventButton(e) === c_left_mouse && cornerShape.isClickedState()){
+					if (mouseupEventButton(e) === c_left_mouse && cornerShape.isClickedState()){
 						e.preventDefault();
 						if (cornerShape.startPos == cornerShape.lastPos){
 							log(cornerShape.attr('id') + ' only click');
@@ -759,7 +759,7 @@ $(document).ready(function(){
 				};
 				cornerShape.mouseDownHandler = function(e){
 					checkEditorIsOpened();
-					if (eventButton(e) === c_left_mouse && isClickedObject(0)){
+					if (mousedownEventButton(e) === c_left_mouse && isClickedObject(0)){
 						e.preventDefault();
 						setClickedObject(cornerShape);
 						cornerShape.isPressed = true
@@ -777,7 +777,7 @@ $(document).ready(function(){
 				};
 				cornerShape.mouseMoveHandler = function(e){
 					if (cornerShape.isClickedState()){//do create something
-						if (e.which != 1){
+						if (mousemoveEventButton(e) != c_left_mouse){
 							cornerShape.resetState();
 							return;
 						}
@@ -809,7 +809,8 @@ $(document).ready(function(){
 
 		function setDraggedPropertiesToShape(draggedShape){
 			setClickedFunctionsToObject(draggedShape);
-			if (draggedShape.hasDraggedProperties) return;
+			if (draggedShape.hasDraggedProperties) 
+				return;
 			draggedShape.hasDraggedProperties = true;
 			draggedShape.isPressed = false;
 			draggedShape.startPos = 0;
@@ -828,11 +829,13 @@ $(document).ready(function(){
 		setDraggedPropertiesToShape(newShape);
 		newShape.mouseUpHandler = function(e){
 			newShape.copyMode = false;
-			var evButton = eventButton(e);
-			if (evButton !== newShape.pendingButton) return;
-			if (!newShape.isClickedState()) return;
+			var evButton = mouseupEventButton(e);
+			if (evButton !== newShape.pendingButton || !newShape.isClickedState()) 
+				return;
+
 			if (evButton === c_left_mouse || evButton === c_right_mouse){
-				if (newShape.isHover()) newShape.showCornerShapes();
+				if (newShape.isHover()) 
+					newShape.showCornerShapes();
 				e.preventDefault();
 				if (newShape.startPos == newShape.lastPos){
 					log(newShape.attr('id') + ' only click');
@@ -848,8 +851,12 @@ $(document).ready(function(){
 				newShape.animationIsBlocked = false;
 				return;
 			}
+
 			newShape.animationIsBlocked = false;
-			if (newShape.clickTrace > c_movingLimit) return;
+
+			if (newShape.clickTrace > c_movingLimit) 
+				return;
+
 			if (evButton === c_middle_mouse){
 				e.preventDefault();
 				newShape.resetState();
@@ -869,7 +876,7 @@ $(document).ready(function(){
 				e.preventDefault();
 				setClickedObject(newShape);
 				newShape.isPressed = true;
-				newShape.pendingButton = eventButton(e);
+				newShape.pendingButton = mousedownEventButton(e);
 				newShape.copyMode = e.ctrlKey == true;///////////////////////////
 				newShape.startPos = {x: e.pageX, y: e.pageY};
 				newShape.lastPos = newShape.startPos;
@@ -879,8 +886,7 @@ $(document).ready(function(){
 		};
 		newShape.mouseMoveHandler = function(e){
 			if (newShape.isClickedState()){
-				if ((isChrome && (e.which != newShape.pendingButton + 1))
-					|| (isFirefox && (eventButton(e) != newShape.pendingButton))){
+				if (mousemoveEventButton(e) !== newShape.pendingButton) {
 					newShape.resetState();
 					return;
 				}
@@ -888,8 +894,9 @@ $(document).ready(function(){
 				if (vectorLengthPoints(currentPos, newShape.startPos) < c_movingLimit 
 					&& newShape.clickTrace < c_movingLimit) return;
 					newShape.clickTrace += vectorLengthPoints(currentPos, newShape.lastPos);
-				if (e.which != 1) return;
-				if (newShape.copyMode && e.ctrlKey == true){
+				if (newShape.pendingButton !== c_left_mouse) 
+					return;
+				if (newShape.copyMode && e.ctrlKey === true){
 					newShape.copyMode = false;
 					var clonedShape = newShape.clone(false);
 					area.append(clonedShape);
@@ -943,7 +950,7 @@ $(document).ready(function(){
 	findAndSetBehaviourToShapes();
 
 	function vectorLength(ax, ay, bx, by){
-		return Math.pow((ax-bx)*(ax-bx)+(ay-by)*(ay-by), 0.5);
+		return Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
 	};
 
 	function vectorLengthPoints(p1, p2){
@@ -972,13 +979,17 @@ $(document).ready(function(){
 		mouseleave: function(e){},
 		mousemove: function(e){
 			if(area.editShapeState) {
-				if (area.currentActiveEditor.mouseMoveHandler)
+				if (area.currentActiveEditor.mouseMoveHandler){
+					e.preventDefault();
 					area.currentActiveEditor.mouseMoveHandler(e);
+				}
+				//return;
 			}
 
 			//log(clickedObject != 0);
 			if (area.isClickedState()){//do create new shape
-				if (e.which != 1 && e.which != 2 && e.which != 3){
+				var evButton = mousemoveEventButton(e);
+				if (evButton !== c_left_mouse && evButton !== c_right_mouse && evButton !== c_middle_mouse) {
 					area.resetState();
 					return;
 				}
@@ -986,7 +997,6 @@ $(document).ready(function(){
 
 				e.preventDefault();
 
-				var evButton = eventButton(e);
 				if (evButton === c_middle_mouse){
 					var currentPos = {top:e.pageY, left:e.pageX};
 
@@ -1067,11 +1077,13 @@ $(document).ready(function(){
 		},
 		mouseup: function(e){
 			if(area.editShapeState) {
-				if (area.currentActiveEditor.mouseUpHandler)
+				if (area.currentActiveEditor.mouseUpHandler){
+					e.preventDefault();
 					area.currentActiveEditor.mouseUpHandler(e);
-				return;
+				}
+				//return;
 			}
-			var evButton = eventButton(e);
+			var evButton = mouseupEventButton(e);
 			if (evButton === c_left_mouse || evButton === c_right_mouse || evButton == c_middle_mouse){
 				if (area.isClickedState()){
 					e.preventDefault();
@@ -1124,12 +1136,12 @@ $(document).ready(function(){
 		},
 		mousedown: function(e){
 			checkEditorIsOpened();
-			var evButton = eventButton(e);
+			var evButton = mousedownEventButton(e);
 			if ((evButton === c_left_mouse || evButton === c_right_mouse || evButton == c_middle_mouse) && isClickedObject(0)){
 				e.preventDefault();
 				area.setClickedState(e);
 				log(e);
-				//log(area.attr('id') +" mousedown OK");
+				log(area.attr('id') +" mousedown OK");
 			}
 		}
 	});
