@@ -743,7 +743,7 @@ $(document).ready(function(){
 			obj.setHandlersToCornerShape = function(cornerShape){
 				setDraggedPropertiesToShape(cornerShape);
 				cornerShape.mouseUpHandler = function(e){
-					if (e.button == 0 && cornerShape.isClickedState()){
+					if (eventButton(e) === c_left_mouse && cornerShape.isClickedState()){
 						e.preventDefault();
 						if (cornerShape.startPos == cornerShape.lastPos){
 							log(cornerShape.attr('id') + ' only click');
@@ -759,7 +759,7 @@ $(document).ready(function(){
 				};
 				cornerShape.mouseDownHandler = function(e){
 					checkEditorIsOpened();
-					if (e.button == 0 && isClickedObject(0)){
+					if (eventButton(e) === c_left_mouse && isClickedObject(0)){
 						e.preventDefault();
 						setClickedObject(cornerShape);
 						cornerShape.isPressed = true
