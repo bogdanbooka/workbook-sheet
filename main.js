@@ -1,7 +1,7 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
 function log(obj){
-	/*console.log(obj);//*/
+	console.log(obj);//*/
 }
 
 $(document).ready(function(){
@@ -21,8 +21,8 @@ $(document).ready(function(){
 		body.scrollTop(2500);
 	}
 	else{
-		var c_left_mouse = 0;
-		var c_middle_mouse = 1;
+		var c_left_mouse = 1;
+		var c_middle_mouse = 4;
 		var c_right_mouse = 2;
 
 		window.scrollTo(3500, 2500);
@@ -141,12 +141,28 @@ $(document).ready(function(){
 		function vectorLength(ax,ay,bx,by){
 			return Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
 		}
+		function eventButton(e)
+		{
+			if (isChrome) {
+				return e.button;
+			}else if (isFirefox) {
+				return e.buttons;
+			};
+		}
 		imageEditor.mouseMoveHandler = function (e){
-			if (!canvas.clickedObject)return;
+			log("imageEditor.mouseMoveHandler :" + eventButton(e))
+			function isInvalidMove(e){
+				var eButton = eventButton(e);
+				var buttonIsInvalid = (eButton !== c_left_mouse && eButton !== c_right_mouse && eButton !== c_middle_mouse) || canvas.pendingButton !== eButton;
+				return !canvas.clickedObject || buttonIsInvalid;
+			};
+			if (!canvas.clickedObject){
+				return;
+			};
 			if (canvas.clickedObject === canvas.clearShape){
 				canvas.clearShape.mouseMoveHandler(e);
 				return;
-			} else if (!canvas.clickedObject || (e.button !== 0 && e.button !== 2 && e.button !== 1) || canvas.pendingButton !== e.button){
+			} else if (!canvas.clickedObject || isInvalidMove(e)){
 				canvas.startPos = 0;
 				canvas.endPos = 0;
 				canvas.clickedObject = false;
@@ -158,7 +174,7 @@ $(document).ready(function(){
 				return;
 			}
 			e.stopPropagation();
-			if (canvas.pendingButton === 0){
+			if (canvas.pendingButton === c_left_mouse){
 				var length = vectorLength(canvas.endPos.x,canvas.endPos.y,e.pageX - canvas.pos.x,e.pageY - canvas.pos.y);//505 340
 				if (length < 5) return;
 				ctx.beginPath();
@@ -184,7 +200,10 @@ $(document).ready(function(){
 			imageEditor.doNotEdited = false;
 		};
 		imageEditor.mouseDownHandler = function (e){
-			if ((e.button !== 0 && e.button !== 1 && e.button !== 2) || canvas.pendingButton){
+			log("imageEditor.mouseDownHandler :" + eventButton(e))
+
+			var eButton = eventButton(e);
+			if ((eButton !== c_left_mouse && eButton !== c_right_mouse && eButton !== c_middle_mouse) || canvas.pendingButton){
 				canvas.clickedObject = false;
 				canvas.pendingButton = false;
 			}else{
@@ -193,7 +212,7 @@ $(document).ready(function(){
 				canvas.startPos = {x: e.pageX - canvas.pos.x, y: e.pageY - canvas.pos.y};
 				canvas.endPos = canvas.startPos;
 				canvas.clickedObject = imageEditor;
-				canvas.pendingButton = e.button;
+				canvas.pendingButton = eButton;
 			}
 			if (canvas.clearShape){
 				//copy clearShape image to current place
@@ -206,7 +225,7 @@ $(document).ready(function(){
 			return false;
 		};
 		imageEditor.internalMouseUpHandler = function(e){
-			if (canvas.pendingButton === 0){
+			if (canvas.pendingButton === c_left_mouse){
 				e.stopPropagation();
 				if (canvas.startPos == canvas.endPos){
 					ctx.beginPath();
@@ -223,7 +242,7 @@ $(document).ready(function(){
 				var _h = canvas.clearShape.height();
 				var _x = canvas.clearShape.position().left;
 				var _y = canvas.clearShape.position().top;
-				if (canvas.pendingButton == 1){
+				if (canvas.pendingButton === c_right_mouse){
 					imageEditor.doNotEdited = false;
 					ctx.clearRect(_x, _y, _w, _h);
 					canvas.clearShape.remove();
@@ -247,11 +266,12 @@ $(document).ready(function(){
 					canvas.clearShape.selectMode = true;
 
 					canvas.clearShape.mouseMoveHandler = function(e){
-						if (e.button === 1){ 
+						var evButton = eventButton(e);
+						if (evButton === c_left_mouse){ 
 							e.preventDefault(); return false;
 						};
 						log("clearShape mousemove");
-						if (!canvas.clickedObject || (e.button !== canvas.clearShape.pendingButton)){
+						if (!canvas.clickedObject || (evButton !== canvas.clearShape.pendingButton)){
 							canvas.clearShape.pendingButton = false;
 							canvas.clickedObject = false;
 						}else{
@@ -272,7 +292,8 @@ $(document).ready(function(){
 					};
 					canvas.clearShape.mouseDownHandler = function(e){
 						log("clearShape mousedown");
-						if ((e.button !== 0 && e.button !== 1) || canvas.clearShape.pendingButton){
+						var evButton = eventButton(e);
+						if ((evButton !== c_left_mouse && evButton !== c_right_mouse) || canvas.clearShape.pendingButton){
 							canvas.clickedObject = false;
 							canvas.clearShape.pendingButton = false;
 						}else{
@@ -280,9 +301,9 @@ $(document).ready(function(){
 							canvas.clearShape.pos = {x: canvas.clearShape.position().left, y: canvas.clearShape.position().top};
 							canvas.clearShape.startPos = {x: e.screenX, y: e.screenY};
 							canvas.clearShape.endPos = canvas.clearShape.startPos;
-							canvas.clearShape.pendingButton = e.button;
+							canvas.clearShape.pendingButton = evButton;
 							canvas.clickedObject = canvas.clearShape;
-							if (e.ctrlKey == true && e.button === 0){
+							if (e.ctrlKey == true && evButton === c_left_mouse){
 								ctx.drawImage(canvas.clearShape.image[0], canvas.clearShape.position().left, canvas.clearShape.position().top);
 							}
 
@@ -950,7 +971,7 @@ $(document).ready(function(){
 					area.currentActiveEditor.mouseMoveHandler(e);
 			}
 
-			log(clickedObject != 0);
+			//log(clickedObject != 0);
 			if (area.isClickedState()){//do create new shape
 				if (e.which != 1 && e.which != 2 && e.which != 3){
 					area.resetState();
