@@ -1,7 +1,7 @@
 //Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
 function log(obj){
-	console.log(obj);//*/
+	/*console.log(obj);//*/
 }
 
 $(document).ready(function(){
@@ -27,7 +27,18 @@ $(document).ready(function(){
 
 		window.scrollTo(3500, 2500);
 	}
-	body.mousedown(function(e){if(e.button == c_middle_mouse) return false});
+	function eventButton(e)
+	{
+		if (isChrome) {
+			return e.button;
+		}else if (isFirefox) {
+			return e.buttons;
+		};
+	};
+
+	body.mousedown(function(e){
+		if(eventButton(e) == c_middle_mouse) return false;
+	});
 
 
 	var c_newCreatedShapesCount = 0;
@@ -140,14 +151,6 @@ $(document).ready(function(){
 		ctx.fillStyle = styleLeftBtn;
 		function vectorLength(ax,ay,bx,by){
 			return Math.sqrt((ax-bx)*(ax-bx)+(ay-by)*(ay-by));
-		}
-		function eventButton(e)
-		{
-			if (isChrome) {
-				return e.button;
-			}else if (isFirefox) {
-				return e.buttons;
-			};
 		}
 		imageEditor.mouseMoveHandler = function (e){
 			log("imageEditor.mouseMoveHandler :" + eventButton(e))
