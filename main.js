@@ -242,7 +242,7 @@ $(document).ready(function(){
 				var _h = canvas.clearShape.height();
 				var _x = canvas.clearShape.position().left;
 				var _y = canvas.clearShape.position().top;
-				if (canvas.pendingButton === c_right_mouse){
+				if (canvas.pendingButton === c_middle_mouse){
 					imageEditor.doNotEdited = false;
 					ctx.clearRect(_x, _y, _w, _h);
 					canvas.clearShape.remove();
@@ -267,7 +267,7 @@ $(document).ready(function(){
 
 					canvas.clearShape.mouseMoveHandler = function(e){
 						var evButton = eventButton(e);
-						if (evButton === c_left_mouse){ 
+						if (evButton === c_middle_mouse){ 
 							e.preventDefault(); return false;
 						};
 						log("clearShape mousemove");
@@ -293,7 +293,7 @@ $(document).ready(function(){
 					canvas.clearShape.mouseDownHandler = function(e){
 						log("clearShape mousedown");
 						var evButton = eventButton(e);
-						if ((evButton !== c_left_mouse && evButton !== c_right_mouse) || canvas.clearShape.pendingButton){
+						if ((evButton !== c_left_mouse && evButton !== c_middle_mouse) || canvas.clearShape.pendingButton){
 							canvas.clickedObject = false;
 							canvas.clearShape.pendingButton = false;
 						}else{
