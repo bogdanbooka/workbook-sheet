@@ -1,5 +1,6 @@
-//Melnikov Bogdan, December 2014
+//Melnikov Bogdan, Jun 2020
 //booka.friend.of.sun@gmail.com
+
 function log(obj){
 	//console.log(obj);//*/
 }
