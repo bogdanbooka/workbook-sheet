@@ -11,13 +11,14 @@
 body{
 	margin: 0px;
 	overflow: auto;
+	background-color:#cccccc; 
 }
 #drag_area { 
 	position: absolute;
 	display: block; 
 	background-color:#cccccc; 
 	width: 8000px; 
-	height: 6000px;
+  height: 6000px;
 }
 
 #canvasHolder{
@@ -53,11 +54,11 @@ body{
 	max-width: 100%;
 	max-height: 100%;
 	margin: auto;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
 }
 
 img[src=""]{
@@ -88,18 +89,24 @@ img[src=""]{
 	font-size: 14px;
 	text-align: center;
 }
+
 .moveAble#wrong_draggable 		{background-color:rgba(255,190,200,0.7); border: 1px solid rgba(100,0,0,0.7);}
+
 .moveAble#draggable,
 .moveAble#draggable[color="default"]	{background-color:rgba(200,220,200,0.7); border: 1px solid rgba(0,100,0,0.7); color: rgba(0,0,0,0.7);}
+
 .moveAble#draggable[color="red"] 	{background-color:rgba(255,170,170,0.7); color: rgba(0,0,0,0.7);}
 .moveAble#draggable[color="green"] 	{background-color:rgba(170,255,170,0.7); color: rgba(0,0,0,0.7);}
 .moveAble#draggable[color="blue"] 	{background-color:rgba(170,170,255,0.7); color: rgba(0,0,0,0.7);}
 .moveAble#draggable[color="yellow"] 	{background-color:rgba(255,255,170,0.7); color: rgba(0,0,0,0.7);}
+
 div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 .moveAble#selecting_draggable 	{background-color:rgba(200,200,255,0.1); border: 1px solid rgba(0,0,100,1.0);}
 .moveAble#selected_draggable 	{background-color:rgba(200,200,255,0.7); border: 1px solid rgba(0,0,100,0.7);}
-#drag_txt { align-content: center;}
+#drag_txt 			{align-content: center;}
+
 .corner_shape 		{position: absolute; display: block; width: 16px; height: 16px; border-radius: 8px;}
+
 #left_top 		{ background-color:#ffaaaa; border-top-left-radius: 1px;}
 #left_top:hover		{ background-color:#ff6666;}
 #left_bottom 		{ background-color:#aaffaa; border-bottom-left-radius: 1px;}
@@ -114,7 +121,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 	<div id="drag_area" isclicked="false">
 		<div id="draggable" class="moveAble" index="0" style="z-index: 1; top: 2505px; left: 3530px; width: 200px; height: 30px;" isclicked="false" color="yellow">
 			<div id="textHolder"><p id="text">This is workbook sheet</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 22px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 192px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
@@ -122,7 +129,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 2; top: 2545px; left: 3580px; width: 550px; height: 20px;" index="1" isclicked="false" color="blue">
 			<div id="textHolder"><p id="text">- left mouse button + drag on clear area = create a box and open for input a text</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 12px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 542px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
@@ -130,7 +137,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 3; top: 2570px; left: 3750px; width: 550px; height: 40px;" index="2" color="green" isclicked="false">
 			<div id="textHolder"><p id="text">Edit text mode:<br>- click outside the box on clear area = save text to the box and close editor</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 32px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 542px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
@@ -138,7 +145,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 4; top: 2620px; left: 3580px; width: 550px; height: 20px;" index="3" color="blue" isclicked="false">
 			<div id="textHolder"><p id="text">- right mouse button + drag = create a box and open for draw picture</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 12px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 542px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
@@ -146,7 +153,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 5; top: 2645px; left: 3750px; width: 550px; height: 85px;" index="4" color="green" isclicked="false">
 			<div id="textHolder"><p id="text">Draw picture mode:<br>-left button + drag = draw<br>-middle button + drag = clear<br>-right button + drag = select part of image and move(+CTRL = copy & move)<br>- click outside the editor box =  save image to the box and close editor</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 77px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 542px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
@@ -154,7 +161,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 6; top: 2740px; left: 3580px; width: 500px; height: 20px;" index="5" color="blue" isclicked="false">
 			<div id="textHolder"><p id="text">- left mouse button click on box + drag = move box</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 12px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 492px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
@@ -162,7 +169,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 7; top: 2770px; left: 3580px; width: 500px; height: 30px;" index="5" color="red" isclicked="false">
 			<div id="textHolder"><p id="text">- middle mouse button click on box = delete box</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 22px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 492px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
@@ -170,7 +177,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" index="0" style="z-index: 8; top: 2810px; left: 3580px; width: 500px; height: 20px;" isclicked="false" color="blue">
 			<div id="textHolder"><p id="text">- CTRL + left mouse button + drag on the box = create a clone of this box<br></p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 12px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 492px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
@@ -178,7 +185,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 9; top: 2840px; left: 3580px; width: 500px; height: 20px;" index="7" isclicked="false" color="default">
 			<div id="textHolder"><p id="text">- left click on the corner shape = apply/cancel the corners shape color to box</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 12px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 492px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
@@ -186,7 +193,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 10; top: 2870px; left: 3580px; width: 500px; height: 20px;" index="8" color="blue">
 			<div id="textHolder"><p id="text">- left mouse button + drag on corner shape = resize box</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 12px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 492px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
@@ -194,7 +201,7 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 		</div>
 		<div id="draggable" class="moveAble" style="z-index: 11; top: 2915px; left: 3540px; width: 330px; height: 90px;" index="9" color="red" isclicked="false">
 			<div id="textHolder"><p id="text">You can save this document and use it off-line<br>(all images/texts will be saved to this document file)<br><br> tested for Chromium</p></div>
-			<div id="imageHolder"><img id="image" src=""></div>
+			<div id="imageHolder"><img id="image"></div>
 			<div id="left_top" class="corner_shape" style="top: 8px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
 			<div id="left_bottom" class="corner_shape" style="top: 82px; left: 8px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
 			<div id="right_top" class="corner_shape" style="top: 8px; left: 322px; display: block; opacity: 0; width: 0px; height: 0px;"></div>
@@ -209,5 +216,6 @@ div[isclicked="true"]		{background-color:rgba(200,255,200,1.0);}
 			<div id="right_bottom" class="corner_shape" style="top: 70px; left: 152px; display: block; opacity: 0; width: 0px; height: 0px;" isclicked="false"></div>
 		</div>
 	</div>
+
 </body>
 </html>
