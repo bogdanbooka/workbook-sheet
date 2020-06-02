@@ -15,14 +15,19 @@ $(document).ready(function(){
 	var c_left_mouse = 1;
 	var c_middle_mouse = 4;
 	var c_right_mouse = 2;
+	
+	if ('scrollRestoration' in history) 
+	{
+    history.scrollRestoration = 'manual';
+  }
 
-	if (isChrome) {
-		body.scrollLeft(3500);
-		body.scrollTop(2500);
-	}
-	else{
-		window.scrollTo(3500, 2500);
-	};
+  setTimeout(function(){
+      var maxScrollX = 8000 - window.innerWidth;
+      var maxScrollY = 6000 - window.innerHeight;
+      window.scrollTo(maxScrollX /2, maxScrollY /2 - window.innerHeight/4)
+    },2
+  );
+
 	function mousedownEventButton(e)
 	{
 		return e.buttons;
@@ -111,7 +116,7 @@ $(document).ready(function(){
 	var docWindow = $(window); 
 
 	function showPicEditorForObject(obj){
-		var alreadyHasImage = ((obj.imgObj) && (obj.imgObj.attr("src").length > 0));
+		var alreadyHasImage = ((obj.imgObj) && obj.imgObj.attr("src") && (obj.imgObj.attr("src").length > 0));
 		if (!alreadyHasImage) addImgObjToShape(obj);
 		var windowSize = {w: docWindow.width() , h: docWindow.height()};
 
@@ -119,7 +124,9 @@ $(document).ready(function(){
 		if (alreadyHasImage){
 			var img_element = obj.imgObj;
 			var t = new Image();
-			t.src = (img_element.attr ? img_element.attr("src") : false) || img_element.src;
+			if (img_element.attr && img_element.attr("src")){
+				t.src = img_element.src;
+			}
 			objSize = {w: t.width, h: t.height};
 		}
 		
@@ -132,11 +139,9 @@ $(document).ready(function(){
 			editorSize.w = windowSize.w*c_imageEditorRelativeSize;
 			editorSize.h = editorSize.w/(objSize.w/objSize.h);
 		}
-		if (isChrome) {
-			var editorPos = {x: (windowSize.w - editorSize.w) / 2 + body.scrollLeft(), y: (windowSize.h - editorSize.h) / 2 + body.scrollTop()};
-		}else if (isFirefox) {
-			var editorPos = {x: (windowSize.w - editorSize.w) / 2 + window.scrollX, y: (windowSize.h - editorSize.h) / 2 + window.scrollY};
-		};
+
+		var editorPos = {x: (windowSize.w - editorSize.w) / 2 + window.scrollX, y: (windowSize.h - editorSize.h) / 2 + window.scrollY};
+
 		var imageEditor = $('<div id="canvasHolder" style="position:absolute; z-index:'+topZOrder()
 			+';"><canvas id="imageEditor" width="'+editorSize.w
 			+'" height="'+editorSize.h+'" style="cursor: crosshair; max-width: 100%; max-height: 100%;"></canvas></div>');
@@ -252,7 +257,7 @@ $(document).ready(function(){
 					canvas.clearShape = false;
 				}else{
 					var imgData=ctx.getImageData(_x, _y, _w, _h);
-					canvas.clearShape.image = $('<img id="copiedImage" src="" style="width:100%; height:100%;"/>');
+					canvas.clearShape.image = $('<img id="copiedImage" style="width:100%; height:100%;"/>');
 					canvas.clearShape.append(canvas.clearShape.image);
 					canvas.clearShape.wasMoving = false;
 					var oCanvas = document.createElement("canvas");
@@ -456,7 +461,7 @@ $(document).ready(function(){
 			canvasContext.drawImage(this[0],0,0,this[0].naturalWidth,this[0].naturalHeight,0,0,size.w,size.h);
 		}
 		imgObj.hasPicture = function(){
-			return imgObj.attr('src').length > 0;
+			return imgObj.attr('src') && imgObj.attr('src').length > 0;
 		}
 	}
 	function addImgObjToShape(newShape){
@@ -464,7 +469,7 @@ $(document).ready(function(){
 			return;
 		}
 		var imageHolder = $('<div id="imageHolder"></div>');
-		var imgObj = $('<img id="image" src=""/>');
+		var imgObj = $('<img id="image"/>');
 
 		imageHolder.append(imgObj);
 		newShape.append(imageHolder);
@@ -1005,12 +1010,8 @@ $(document).ready(function(){
 
 					area.lastPos = {top:e.pageY - dy, left:e.pageX - dx};
 
-					if (isChrome) {
-						body.scrollLeft(body.scrollLeft() - dx);
-						body.scrollTop(body.scrollTop() - dy);
-					}else if (isFirefox) {
-						window.scrollBy(-dx, -dy);
-					};
+					window.scrollBy(-dx, -dy);
+
 					return;
 				}
 
