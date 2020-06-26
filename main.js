@@ -116,6 +116,9 @@ $(document).ready(function(){
 	var docWindow = $(window); 
 
 	function showPicEditorForObject(obj){
+	  if (area.editShapeState){
+	    return;
+	  }
 		var alreadyHasImage = ((obj.imgObj) && (obj.imgObj.attr("src").length > 0));
 		if (!alreadyHasImage) addImgObjToShape(obj);
 		var windowSize = {w: docWindow.width() , h: docWindow.height()};
@@ -384,6 +387,9 @@ $(document).ready(function(){
 		area.editShapeState = true;
 	}
 	function showTextEditorForObject(obj){
+	  if (area.editShapeState){
+	    return;
+	  }
 		var objText = '';
 		if (obj.textObj && obj.textObj.text().length > 0){
 			objText = obj.textObj.html();
