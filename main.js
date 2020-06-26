@@ -1,6 +1,5 @@
-//Melnikov Bogdan, Jun 2020
+//Melnikov Bogdan, December 2014
 //booka.friend.of.sun@gmail.com
-
 function log(obj){
 	//console.log(obj);//*/
 }
@@ -117,7 +116,7 @@ $(document).ready(function(){
 	var docWindow = $(window); 
 
 	function showPicEditorForObject(obj){
-		var alreadyHasImage = ((obj.imgObj) && obj.imgObj.attr("src") && (obj.imgObj.attr("src").length > 0));
+		var alreadyHasImage = ((obj.imgObj) && (obj.imgObj.attr("src").length > 0));
 		if (!alreadyHasImage) addImgObjToShape(obj);
 		var windowSize = {w: docWindow.width() , h: docWindow.height()};
 
@@ -125,9 +124,7 @@ $(document).ready(function(){
 		if (alreadyHasImage){
 			var img_element = obj.imgObj;
 			var t = new Image();
-			if (img_element.attr && img_element.attr("src")){
-				t.src = img_element.src;
-			}
+			t.src = (img_element.attr ? img_element.attr("src") : false) || img_element.src;
 			objSize = {w: t.width, h: t.height};
 		}
 		
@@ -258,7 +255,7 @@ $(document).ready(function(){
 					canvas.clearShape = false;
 				}else{
 					var imgData=ctx.getImageData(_x, _y, _w, _h);
-					canvas.clearShape.image = $('<img id="copiedImage" style="width:100%; height:100%;"/>');
+					canvas.clearShape.image = $('<img id="copiedImage" src="" style="width:100%; height:100%;"/>');
 					canvas.clearShape.append(canvas.clearShape.image);
 					canvas.clearShape.wasMoving = false;
 					var oCanvas = document.createElement("canvas");
@@ -462,7 +459,7 @@ $(document).ready(function(){
 			canvasContext.drawImage(this[0],0,0,this[0].naturalWidth,this[0].naturalHeight,0,0,size.w,size.h);
 		}
 		imgObj.hasPicture = function(){
-			return imgObj.attr('src') && imgObj.attr('src').length > 0;
+			return imgObj.attr('src');
 		}
 	}
 	function addImgObjToShape(newShape){
@@ -470,7 +467,7 @@ $(document).ready(function(){
 			return;
 		}
 		var imageHolder = $('<div id="imageHolder"></div>');
-		var imgObj = $('<img id="image"/>');
+		var imgObj = $('<img id="image" src=""/>');
 
 		imageHolder.append(imgObj);
 		newShape.append(imageHolder);
